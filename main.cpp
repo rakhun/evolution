@@ -8,11 +8,9 @@
 #include "eventmanager.h"
 #include "world.h"
 
-std::vector<void*> plugins;
-std::vector<int (*)(int, const char**, int&)> argHandlers;
-
 int main(int argc, const char** argv)
 {
+  std::vector<int (*)(int, const char**, int&)> argHandlers;
   std::vector<creature*> people;
   eventManager* eventmanager=new eventManager();
   world worldinfo;
