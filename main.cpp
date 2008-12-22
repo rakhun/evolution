@@ -37,7 +37,7 @@ int main(int argc, const char** argv)
       void* handle=dlopen(filename, RTLD_LAZY);
       if(!handle){fprintf(stderr, "Failed to load plugin '%s': %s\n", file->d_name, dlerror()); continue;}
       void (*initplugin)(pointers*)=(void (*)(pointers*))dlsym(handle, "initplugin");
-      if(const char* error=dlerror()){fprintf(stderr, "Failed to initialize plugin '%s': %s\n", file->d_name, error); continue;}
+      if(const char* error=dlerror()){fprintf(stderr, "Failed to initialize plugin '%s': %s\n", file->d_name, error); dlclose(handle); continue;}
       initplugin(pointers::getInstance());
     }
   }
