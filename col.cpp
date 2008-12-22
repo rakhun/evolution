@@ -6,6 +6,7 @@
 
 void creature::execute()
 {
+  if(!col_length) return; // Creatures like that ought to die.. but nature will deal with that
   unsigned char arg=col[pointer*2+1];
   switch(col[pointer*2])
   {
