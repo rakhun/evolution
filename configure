@@ -1,0 +1,14 @@
+(
+echo -n "Checking for SDL... " >&2
+echo "#include <SDL/SDL.h>
+int main(){}" > /tmp/sdltest.c
+[ "$(which sdl-config 2> /dev/null)" = "" ] && alias sdl-config="echo -lSDL"
+gcc /tmp/sdltest.c $(sdl-config --libs) $(sdl-config --cflags) -o /tmp/sdltest 2> /dev/null && (
+echo "USE_SDL = yes"
+echo "SDLFLAGS = $(sdl-config --cflags) $(sdl-config --libs)"
+echo "Yes" >&2
+) || echo "No" >&2
+rm -f /tmp/sdltest /tmp/sdltest.c
+
+#other test
+) > Makeconfig

@@ -1,0 +1,20 @@
+unsigned char command, unsigned char arg
+Written form:
+F0:0D
+2:7f
+
+Specifics: in functions using x-128, the value will be increased by one if the result is 0 or more, this is to make the maximum and minimum values more even, and an argument of zero would give no result either way
+
+Command		Argument	Description
+0 Walk		Length (x-128)	Walk, longer distance gives higher health penalty
+1 Turn		Angle (x-128)	Turn $Angle/256 of a rotation from the current angle
+2 Jump		Length (x-128)	Jump $Length steps with the pointer
+3 Look		?		Write visual information to memory
+4 Mempointer	Length (x-128)	Move the memory pointer $Length steps
+5 If		Value		Execute the following command if mem[$memP]=$Value
+6 IfNot		Value		Execute the following command if mem[$memP]!=$Value
+7 IfMore	Value		Execute the following command if mem[$memP]>$Value
+8 IfLess	Value		Execute the following command if mem[$memP]<$Value
+9 Eat		?		Try to consume the object in front
+a Attack	?		Try to attack the object in front
+b Push		?		Try to push the object in front forward
