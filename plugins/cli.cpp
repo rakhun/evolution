@@ -35,36 +35,40 @@ void* commandinput(void* pointer)
       i++;
     }
     /// @todo Delete this mem when you're done
-    if(!strcmp(argv[0], "exit"))
+    if(argv[0]&&argv[0][0])
     {
-      exit(0);
-    }
-    else if(!strcmp(argv[0], "help"))
-    {
-      puts("Available commands:");
-      puts("exit                  Exits EvolutionBots");
-      puts("create [type] [X] [Y] Creates a new creature at X, Y.");
-      puts("                       Type=default or manual (using a default");
-      puts("                       COL script or entering code manually)");
-    }
-    else if(!strcmp(argv[0], "create"))
-    {
-      if(argc!=4)
+      if(!strcmp(argv[0], "exit"))
       {
-        puts("Usage: create [type=default/manual] [X] [Y]");
-        continue;
+        exit(0);
       }
-      if(!strcmp("manual", argv[1]))
+      else if(!strcmp(argv[0], "help"))
       {
-        puts("Manual creation not yet implemented.");
-      }else{ // Default to 'default'
-        /// @todo Write some proper default code that actually does something.
-        creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), (const unsigned char*)"");
-        std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointer("creatures");
-        people->push_back(baby);
+        puts("Available commands:");
+        puts("exit                  Exits EvolutionBots");
+        puts("create [type] [X] [Y] Creates a new creature at X, Y.");
+        puts("                       Type=default or manual (using a default");
+        puts("                       COL script or entering code manually)");
       }
+      else if(!strcmp(argv[0], "create"))
+      {
+        if(argc!=4)
+        {
+          puts("Usage: create [type=default/manual] [X] [Y]");
+          continue;
+        }
+        if(!strcmp("manual", argv[1]))
+        {
+          puts("Manual creation not yet implemented.");
+        }else{ // Default to 'default'
+          /// @todo Write some proper default code that actually does something.
+          creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), (const unsigned char*)"");
+          std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointer("creatures");
+          people->push_back(baby);
+          printf("Number of creatures in the people vector: %i\n", people->size());
+        }
+      }
+      else{puts("Unknown command. Type 'help' to get a list of available commands");}
     }
-    else{puts("Unknown command. Type 'help' to get a list of available commands");}
   }
 }
 
