@@ -36,10 +36,8 @@ int main(int argc, const char** argv)
       #endif
       void* handle=dlopen(filename, RTLD_LAZY);
       if(!handle){fprintf(stderr, "Failed to load plugin '%s': %s\n", file->d_name, dlerror()); continue;}
-//      plugvoid_vectorint_intcharint initplugin=(plugvoid_vectorint_intcharint)dlsym(handle, "initplugin");
       void (*initplugin)(pointers*)=(void (*)(pointers*))dlsym(handle, "initplugin");
       if(const char* error=dlerror()){fprintf(stderr, "Failed to initialize plugin '%s': %s\n", file->d_name, error); continue;}
-//      initplugin(&argHandlers);
       initplugin(pointers::getInstance());
     }
   }
