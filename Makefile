@@ -1,4 +1,6 @@
+ifeq "$(shell [ -e Makeconfig ] && echo Makeconfig)" "Makeconfig"
 include Makeconfig
+endif
 CXXFLAGS += -g
 files = $(wildcard *.cpp)
 

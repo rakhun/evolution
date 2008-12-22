@@ -1,5 +1,10 @@
+ifeq "$(shell [ -e ../Makeconfig ] && echo Makeconfig)" "Makeconfig"
 include ../Makeconfig
+endif
 files = $(wildcard *.cpp)
+ifndef SDLFLAGS
+SDLFLAGS = -lSDL
+endif
 
 all: $(files:.cpp=.so)
 
