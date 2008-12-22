@@ -13,6 +13,9 @@ endif
 
 all: EvolutionBots $(pluginfiles:.cpp=.so) docs
 
+debug:
+	CXXFLAGS="-Ddebug" make
+
 EvolutionBots: $(files:%.cpp=out/%.o)
 	$(CXX) $(CXXFLAGS) $(files:%.cpp=out/%.o) -ldl -o EvolutionBots
 
