@@ -42,18 +42,22 @@ void* SDL_Display(void* pointer)
 
   draw(screen, worldobj->width, worldobj->height);
   SDL_Event event;
-  while(SDL_WaitEvent(&event))
+  while(true)
   {
-    if(event.type==SDL_QUIT)
+    while(SDL_PollEvent(&event))
     {
-      SDL_Quit();
-      exit(0);
-    }
+      if(event.type==SDL_QUIT)
+      {
+        SDL_Quit();
+        exit(0);
+      }
 //    if(event.type==SDL_VIDEOEXPOSE) // Doesn't seem to be of any use with Compiz, but what about without it?
 //    {
-//      SDL_FillRect(screen, &bg, 0x00E000);
-//      SDL_Flip(screen);
+//      draw(screen, worldobj->width, worldobj->height);
 //    }
+    }
+    draw(screen, worldobj->width, worldobj->height);
+    sleep(0.1);
   }
   SDL_Quit();
   pthread_exit(0);
