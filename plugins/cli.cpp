@@ -75,6 +75,8 @@ void* commandinput(void* pointer)
       }
       else{printf("Unknown command '%s'. Type 'help' to get a list of available commands\n", argv[0]);}
     }
+    for(unsigned int i=0; i<argc; i++) delete[] argv[i];
+    delete[] argv;
   }
 }
 
