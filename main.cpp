@@ -3,6 +3,7 @@
 #include <vector>
 #include <dirent.h>
 #include <dlfcn.h>
+#include <unistd.h>
 #include "creature.h"
 #include "pointers.h"
 #include "eventmanager.h"
@@ -67,16 +68,18 @@ int main(int argc, const char** argv)
 
   while(true)
   {
+    pointers::getInstance()->getPointerLockWait("creatures");
     for(unsigned int i=0; i<people.size(); i++)
     {
       people[i]->execute();
-      if(people[i]->getLife()>0){
-        i++;
-      }else{
+      if(people[i]->getLife()<=0){
         people[i]->die(); // Isn't life being 0 enough?
         people.erase(people.begin()+i);
+        i--;
       }
     }
+    pointers::getInstance()->unlockPointer("creatures");
+    usleep(10);
   }
   return 0;
 }
