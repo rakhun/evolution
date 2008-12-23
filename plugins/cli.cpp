@@ -62,12 +62,7 @@ void* commandinput(void* pointer)
         }else{ // Default to 'default'
           /// @todo Write some proper default code that actually does something.
           creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), (const unsigned char*)"");
-          std::vector<creature*>* people=0;
-          while(!people)
-          {
-            people=(std::vector<creature*>*)((pointers*)pointer)->getPointerLock("creatures");
-            if(!people){puts("Creature vector busy.. waiting");sleep(0.01);}
-          }
+          std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointerLockWait("creatures");
           people->push_back(baby);
           printf("Number of creatures in the people vector: %i\n", people->size());
           ((pointers*)pointer)->unlockPointer("creatures");
