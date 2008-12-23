@@ -2,6 +2,7 @@
 /// This file holds the creature class' execute function which interprets the COL (Code Of Life) scripting language
 /// @brief Code for interpreting COL (Code Of Life)
 #include <stdio.h>
+#include <math.h>
 #include "creature.h"
 
 void creature::execute()
@@ -11,22 +12,30 @@ void creature::execute()
   switch(col[pointer*2])
   {
   case 0:
+    if(arg>127)
+    {
+      x+=cos(angle)*(arg-127)/64;
+      y+=sin(angle)*(arg-127)/64;
+    }else{
+      x+=cos(angle)*(arg-128)/64;
+      y+=sin(angle)*(arg-128)/64;
+    }
     break;
   case 1:
     break;
   case 2:
-    if(arg>127)
-      pointer+=arg-127;
-    else
+    if(arg>127) // Always go back one more step so that +0 (which we don't have) would result in a loop
       pointer+=arg-128;
+    else
+      pointer+=arg-129;
     break;
   case 3:
     break;
   case 4:
-    if(arg>127) // Always go back one more step so that +0 (which we don't have) would result in a loop
-      mempointer+=arg-128;
+    if(arg>127)
+      mempointer+=arg-127;
     else
-      mempointer+=arg-129;
+      mempointer+=arg-128;
     if(mempointer>511) mempointer-=512;
     if(mempointer<0) mempointer+=512;
     break;

@@ -1,12 +1,11 @@
 #ifndef EVOLUTION_creature_dot_h
 #define EVOLUTION_creature_dot_h
-//#include "col.h"
-
 /// Class to handle creature individuals and their positions, life etc.
 class creature
 {
 private:
-  int x, y;
+  float x, y;
+  float angle;
   unsigned char* col;
   unsigned int col_length;
   unsigned int pointer;

@@ -13,6 +13,11 @@ creature::creature(int x, int y, const unsigned char* code)
   std::vector<unsigned char> commands;
   std::vector<unsigned char> args;
   col_length=0;
+  pointer=0;
+  health=100;
+  memset(mem, 0, 512);
+  mempointer=0;
+  angle=0;
   while(pos!=(void*)1)
   {
     bool validcommand=false;
