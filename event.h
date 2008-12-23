@@ -1,3 +1,5 @@
+#ifndef EVOLUTION_event_dot_h
+#define EVOLUTION_event_dot_h
 #include <vector>
 
 /// Simple structure to describe an event and any values it may contain
@@ -12,3 +14,4 @@ struct event
   /// String values contained in the event
   std::vector<const char*> strings;
 };
+#endif

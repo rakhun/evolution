@@ -1,3 +1,5 @@
+#ifndef EVOLUTION_world_dot_h
+#define EVOLUTION_world_dot_h
 /// Small struct to provide basic world information, needed for plugins like sdl_display and network
 struct world {
   /// Width of the world in pixels
@@ -5,3 +7,4 @@ struct world {
   /// Height of the world in pixels
   int height;
 };
+#endif

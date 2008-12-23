@@ -1,3 +1,5 @@
+#ifndef EVOLUTION_eventmanager_dot_h
+#define EVOLUTION_eventmanager_dot_h
 #include "event.h"
 
 /// Structure to describe a callback and which events it should be called for
@@ -18,3 +20,4 @@ public:
   /// Trigger an event and call all callbacks registered to it
   bool triggerEvent(event eventobj);
 };
+#endif
