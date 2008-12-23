@@ -75,6 +75,7 @@ extern "C" {
     printf("sdl_display: The size of the world is %ix%i pixels\n", worldobj->width, worldobj->height);
     #endif
 
-    pthread_create(new pthread_t(), NULL, SDL_Display, pointerobj);
+    pthread_t thread;
+    pthread_create(&thread, NULL, SDL_Display, pointerobj);
   }
 }
