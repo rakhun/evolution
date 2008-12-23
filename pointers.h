@@ -6,6 +6,8 @@ struct pointerInfo {
   void* pointer;
   /// The pointer's name
   const char* name;
+  /// Whether the pointer is locked, for thread safety
+  bool locked;
 };
 
 /// A globally available hub for pointers to instances of objects
@@ -20,4 +22,8 @@ public:
   void addPointer(void* pointer, const char* name);
   /// Fetches a pointer based on its name in the list
   void* getPointer(const char* name);
+  /// Fetches a pointer based on its name in the list and locks it
+  void* getPointerLock(const char* name);
+  /// Return control of a previously locked pointer
+  void unlockPointer(const char* name);
 };

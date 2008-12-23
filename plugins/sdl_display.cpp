@@ -21,13 +21,14 @@ void draw(SDL_Surface* screen, int worldwidth, int worldheight)
   dummy.w=dummy.h=20;
 
   SDL_FillRect(screen, &bg, 0x00E000);
-  std::vector<creature*>* people=(std::vector<creature*>*)pointerobj->getPointer("creatures");
+  std::vector<creature*>* people=(std::vector<creature*>*)pointerobj->getPointerLock("creatures");
   if(!people) return;
   for(unsigned int i=0; i<people->size(); i++)
   {
     people->at(i)->getPosition((int&)dummy.x, (int&)dummy.y);
     SDL_FillRect(screen, &dummy, 0xFFFFFF);
   }
+  pointerobj->unlockPointer("creatures");
   SDL_Flip(screen);
 }
 

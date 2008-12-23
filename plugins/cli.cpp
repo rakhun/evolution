@@ -14,7 +14,7 @@ void* commandinput(void* pointer)
   {
     printf("Evolution> ");
     fflush(stdout);
-    fgets(buffer, 1024, stdin);
+    if(!fgets(buffer, 1024, stdin)) continue;
     int tmp=strlen(buffer)-1;
     if(buffer[tmp]=='\n') buffer[tmp]=0;
     int argc=1;
@@ -25,13 +25,13 @@ void* commandinput(void* pointer)
     char** argv=new char*[argc];
     char* arg=buffer;
     unsigned int i=0;
-    while(*arg)
+    while(i<argc)
     {
       char* tmp=strchrnul(arg, ' ');
       tmp[0]=0;
       argv[i]=new char[tmp-arg+1];
       strcpy(argv[i], arg);
-      arg=tmp+1;
+      if(tmp[0]=' ') arg=tmp+1;
       i++;
     }
     /// @todo Delete this mem when you're done
@@ -62,12 +62,18 @@ void* commandinput(void* pointer)
         }else{ // Default to 'default'
           /// @todo Write some proper default code that actually does something.
           creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), (const unsigned char*)"");
-          std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointer("creatures");
+          std::vector<creature*>* people=0;
+          while(!people)
+          {
+            people=(std::vector<creature*>*)((pointers*)pointer)->getPointerLock("creatures");
+            if(!people){puts("Creature vector busy.. waiting");sleep(0.01);}
+          }
           people->push_back(baby);
           printf("Number of creatures in the people vector: %i\n", people->size());
+          ((pointers*)pointer)->unlockPointer("creatures");
         }
       }
-      else{puts("Unknown command. Type 'help' to get a list of available commands");}
+      else{printf("Unknown command '%s'. Type 'help' to get a list of available commands\n", argv[0]);}
     }
   }
 }
