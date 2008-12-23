@@ -1,3 +1,5 @@
+#ifndef EVOLUTION_pointers_dot_h
+#define EVOLUTION_pointers_dot_h
 #include <vector>
 
 /// Structure to hold a pointer and its respective name
@@ -24,6 +26,9 @@ public:
   void* getPointer(const char* name);
   /// Fetches a pointer based on its name in the list and locks it
   void* getPointerLock(const char* name);
+  /// Fetches a pointer based on its name in the list and locks it, waits if it's currently locked
+  void* getPointerLockWait(const char* name);
   /// Return control of a previously locked pointer
   void unlockPointer(const char* name);
 };
+#endif
