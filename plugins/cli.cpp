@@ -61,12 +61,24 @@ void* commandinput(void* pointer)
           puts("Manual creation not yet implemented.");
         }else{ // Default to 'default'
           /// @todo Write some proper default code that actually does something.
-          creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), (const unsigned char*)"");
+          creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), (const unsigned char*)"0:FF\n0:FF\n1:1");
           std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointerLockWait("creatures");
           people->push_back(baby);
           printf("Number of creatures in the people vector: %i\n", people->size());
           ((pointers*)pointer)->unlockPointer("creatures");
         }
+      }
+      else if(!strcmp(argv[0], "ls"))
+      {
+        std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointerLockWait("creatures");
+        printf("%i creatures:\n", people->size());
+        for(unsigned int i=0; i<people->size(); i++)
+        {
+          int x, y;
+          people->at(i)->getPosition(x, y);
+          printf("X: %i, Y: %i, Health: %i\n", x, y, people->at(i)->getLife());
+        }
+        ((pointers*)pointer)->unlockPointer("creatures");
       }
       else{printf("Unknown command '%s'. Type 'help' to get a list of available commands\n", argv[0]);}
     }
