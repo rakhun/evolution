@@ -12,9 +12,6 @@ pointers* pointerobj;
 
 void draw(SDL_Surface* screen, SDL_Rect* bg)
 {
-  SDL_Rect dummy; /// @todo This should be a picture or something, not just a square
-  dummy.w=dummy.h=20;
-
   SDL_FillRect(screen, bg, 0x00E000);
   std::vector<creature*>* people=(std::vector<creature*>*)pointerobj->getPointerLock("creatures");
   if(!people) return;
@@ -22,6 +19,8 @@ void draw(SDL_Surface* screen, SDL_Rect* bg)
   for(unsigned int i=0; i<people->size(); i++)
   {
     people->at(i)->getPosition(x, y);
+    SDL_Rect dummy; /// @todo This should be a picture or something, not just a square
+    dummy.w=dummy.h=20;
     dummy.x=x-10;
     dummy.y=y-10;
     SDL_FillRect(screen, &dummy, 0xFFFFFF);
