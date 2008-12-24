@@ -66,6 +66,7 @@ int main(int argc, const char** argv)
     }
   }
 
+  int x, y;
   while(true)
   {
     pointers::getInstance()->getPointerLockWait("creatures");
@@ -76,6 +77,51 @@ int main(int argc, const char** argv)
         people[i]->die(); // Isn't life being 0 enough?
         people.erase(people.begin()+i);
         i--;
+      }
+      people[i]->getPosition(x, y);
+      if(x<0)
+      {
+        x+=worldinfo.width;
+        people[i]->setPosition(x, y);
+        event warpevent;
+        warpevent.name="warp left";
+        warpevent.integers.push_back(i);
+        pointers::getInstance()->unlockPointer("creatures");
+        eventmanager->triggerEvent(warpevent);
+        pointers::getInstance()->getPointerLockWait("creatures");
+      }
+      if(y<0)
+      {
+        y+=worldinfo.height;
+        people[i]->setPosition(x, y);
+        event warpevent;
+        warpevent.name="warp top";
+        warpevent.integers.push_back(i);
+        pointers::getInstance()->unlockPointer("creatures");
+        eventmanager->triggerEvent(warpevent);
+        pointers::getInstance()->getPointerLockWait("creatures");
+      }
+      if(x>worldinfo.width)
+      {
+        x-=worldinfo.width;
+        people[i]->setPosition(x, y);
+        event warpevent;
+        warpevent.name="warp right";
+        warpevent.integers.push_back(i);
+        pointers::getInstance()->unlockPointer("creatures");
+        eventmanager->triggerEvent(warpevent);
+        pointers::getInstance()->getPointerLockWait("creatures");
+      }
+      if(y>worldinfo.height)
+      {
+        y-=worldinfo.height;
+        people[i]->setPosition(x, y);
+        event warpevent;
+        warpevent.name="warp bottom";
+        warpevent.integers.push_back(i);
+        pointers::getInstance()->unlockPointer("creatures");
+        eventmanager->triggerEvent(warpevent);
+        pointers::getInstance()->getPointerLockWait("creatures");
       }
     }
     pointers::getInstance()->unlockPointer("creatures");

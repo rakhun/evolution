@@ -73,3 +73,9 @@ void creature::getPosition(int& x, int& y)
   x=this->x;
   y=this->y;
 }
+
+void creature::setPosition(int x, int y)
+{
+  this->x=x;
+  this->y=y;
+}

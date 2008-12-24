@@ -36,6 +36,8 @@ public:
   void getCOL(unsigned char*& col, unsigned int& col_length);
   /// Read the creature's position into two integers
   void getPosition(int& x, int& y);
+  /// Moves the creature to the position provided
+  void setPosition(int x, int y);
   /// Returns the creature's health value
   /// @return The health level of the creature
   int getLife(){return health;} 
