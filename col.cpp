@@ -22,6 +22,12 @@ void creature::execute()
     }
     break;
   case 1:
+    if(arg>127)
+    {
+      angle+=M_PIl*(arg-127)/128;
+    }else{
+      angle+=M_PIl*(arg-128)/128;
+    }
     break;
   case 2:
     if(arg>127) // Always go back one more step so that +0 (which we don't have) would result in a loop
