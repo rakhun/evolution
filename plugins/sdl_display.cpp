@@ -10,17 +10,12 @@
 
 pointers* pointerobj;
 
-void draw(SDL_Surface* screen, int worldwidth, int worldheight)
+void draw(SDL_Surface* screen, SDL_Rect* bg)
 {
-  SDL_Rect bg;
-  bg.x=0; bg.y=0;
-  bg.w=worldwidth;
-  bg.h=worldheight;
-
   SDL_Rect dummy; /// @todo This should be a picture or something, not just a square
   dummy.w=dummy.h=20;
 
-  SDL_FillRect(screen, &bg, 0x00E000);
+  SDL_FillRect(screen, bg, 0x00E000);
   std::vector<creature*>* people=(std::vector<creature*>*)pointerobj->getPointerLock("creatures");
   if(!people) return;
   int x, y;
@@ -44,7 +39,12 @@ void* SDL_Display(void* pointer)
   SDL_Surface* screen=SDL_SetVideoMode(worldobj->width, worldobj->height, 24, SDL_HWSURFACE);
   SDL_WM_SetCaption("EvolutionBots", NULL);
 
-  draw(screen, worldobj->width, worldobj->height);
+  SDL_Rect bg;
+  bg.x=bg.y=0;
+  bg.w=worldobj->width;
+  bg.h=worldobj->height;
+
+  draw(screen, &bg);
   SDL_Event event;
   while(true)
   {
@@ -60,8 +60,8 @@ void* SDL_Display(void* pointer)
 //      draw(screen, worldobj->width, worldobj->height);
 //    }
     }
-    draw(screen, worldobj->width, worldobj->height);
-    sleep(0.1);
+    draw(screen, &bg);
+    usleep(200);
   }
   SDL_Quit();
   pthread_exit(0);
