@@ -79,7 +79,7 @@ int main(int argc, const char** argv)
       }
     }
     pointers::getInstance()->unlockPointer("creatures");
-    usleep(10);
+    usleep(50000);
   }
   return 0;
 }

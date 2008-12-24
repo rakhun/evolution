@@ -61,7 +61,7 @@ void* SDL_Display(void* pointer)
 //    }
     }
     draw(screen, &bg);
-    usleep(200);
+    usleep(200000);
   }
   SDL_Quit();
   pthread_exit(0);
