@@ -40,4 +40,7 @@ clean:
 	cd tests && make clean
 	cd plugins && make clean
 
-.PHONY: test docs clean
+distclean: clean
+	rm -f Makeconfig
+
+.PHONY: test docs clean distclean
