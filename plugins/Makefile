@@ -14,6 +14,9 @@ sdl_display.so: sdl_display.cpp ../out/pointers.o ../out/creature.o
 cli.so: cli.cpp ../out/pointers.o ../out/creature.o
 	$(CXX) $(CXXFLAGS) -shared cli.cpp -pthread ../out/pointers.o ../out/creature.o -o cli.so
 
+network.so: network.cpp ../out/pointers.o ../out/creature.o ../out/eventmanager.o
+	$(CXX) $(CXXFLAGS) -shared network.cpp -pthread ../out/pointers.o ../out/creature.o ../out/eventmanager.o -o network.so
+
 %.so: %.cpp ../out/pointers.o ../out/eventmanager.o
 	$(CXX) $(CXXFLAGS) -shared $< ../out/pointers.o ../out/eventmanager.o -o $@
 
