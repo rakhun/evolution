@@ -23,6 +23,11 @@
  *	u_char*512 mem
  *	int mempointer
  *	int health
+ *	(30 bytes total, float & int=4, char=1)
+ * 2	bool		Server tells the client that the connection to the edge
+ * 			requested was successful (1) or failed (0), in which
+ * 			case the client will attempt the next edge provided.
+ * 			Sort of the key to enter networkHandler(..)
  */
 #include <stdio.h>
 #include <string.h>
@@ -34,12 +39,30 @@
 #include "../pointers.h"
 #include "../eventmanager.h"
 
+void* networkServer2(void*);
+
 pointers* pointerhub;
 int connections[4]; // We might need some mutexes here preventing that we send and receive at the same time on a connection
 
 void networkHandler(int connection)
 {
-
+  unsigned char packettype;
+  while(true)
+  {
+    if(recv(connections[connection], &packettype, 1, 0)<1) return;
+    switch(packettype)
+    {
+    case 0:
+      puts("Error! packettype 0 should not appear here");
+      return;
+    case 1:
+      puts("Stub! got packettype 1 in networkHandler()");
+      break;
+    case 2:
+      puts("Error! packettype 2 should not appear here");
+      return;
+    }
+  }
 }
 
 void* networkConnect(void* voidserver)
@@ -70,12 +93,13 @@ void* networkConnect(void* voidserver)
   }
   // *Negotiate edge
   char msg[2];
-  int edge;
+  char edge;
+  char edgesoffered;
   while(true)
   {
     int r=recv(sock, msg, 1, 0);
     if(r<1) return 0;
-    if(msg[0]==0)
+    if(msg[0]==0) // Receiving a list of available edges, answering with a request to connect to one.
     {
       int r=recv(sock, msg+1, 1, 0);
       if(r<1) return 0;
@@ -84,31 +108,98 @@ void* networkConnect(void* voidserver)
       else if(msg[1]&2 &&!connections[1]) edge=2;
       else if(msg[1]&4 &&!connections[2]) edge=3;
       else if(msg[1]&8 &&!connections[3]) edge=4;
+      connections[edge-1]=sock;
+      edgesoffered=msg[1];
       msg[0]=0;
       msg[1]=edge;
       write(sock, msg, 2);
       if(!edge){close(sock); return 0;}
-      break;
+    }else if(msg[0]==2) // Confirmation or decline of request to connect to an edge, trying another edge if declined
+    {
+      int r=recv(sock, msg+1, 1, 0);
+      if(r<1) return 0;
+      if(!(bool)msg[1])
+      {
+        if(edgesoffered&1 &&connections[0]==sock) edgesoffered-=1;
+        else if(edgesoffered&2 &&connections[1]==sock) edgesoffered-=2;
+        else if(edgesoffered&4 &&connections[2]==sock) edgesoffered-=4;
+        else if(edgesoffered&8 &&connections[3]==sock) edgesoffered-=8;
+        connections[edge-1]=0; // Couldn't use that edge, trying another
+        edge=0;
+        if(edgesoffered&1 &&!connections[0]) edge=1;
+        else if(edgesoffered&2 &&!connections[1]) edge=2;
+        else if(edgesoffered&4 &&!connections[2]) edge=3;
+        else if(edgesoffered&8 &&!connections[3]) edge=4;
+        connections[edge-1]=sock;
+        msg[0]=0;
+        msg[1]=edge;
+        write(sock, msg, 2);
+        if(!edge){close(sock); return 0;}
+      }else{
+        break;
+      }
     }
   }
-  connections[edge-1]=sock;
   networkHandler(edge-1);
-  // *Hand over control to a client/server independant function to handle transfer requests
 }
 
-void* networkServer(void* serverdata)
+void* networkServer(void* portstring)
 {
   int sock=socket(AF_INET, SOCK_STREAM, 0);
-  // *Setup the socket and listen for a connection
-  char edges=0;
-  if(!connections[0]) edges+=1;
-  if(!connections[1]) edges+=2;
-  if(!connections[2]) edges+=4;
-  if(!connections[3]) edges+=8;
+  sockaddr_in sockaddr;
+  sockaddr.sin_family=AF_INET;
+  sockaddr.sin_addr.s_addr=INADDR_ANY;
+  sockaddr.sin_port=htons(atoi((const char*)portstring));
+  bind(sock, (const struct sockaddr*)&sockaddr, sizeof(sockaddr));
+  listen(sock, 6);
+  struct sockaddr_in clientinfo;
+  socklen_t addrlen=sizeof(sockaddr);
+  while(int client=accept(sock, (struct sockaddr*)&clientinfo, &addrlen)>=0)
+  {
+    pthread_create(new pthread_t, NULL, networkServer2, (void*)client);
+  }
+}
+
+void* networkServer2(void* socket)
+{
+  char edge=0;
+  if(!connections[0]) edge+=1;
+  if(!connections[1]) edge+=2;
+  if(!connections[2]) edge+=4;
+  if(!connections[3]) edge+=8;
   char msg[2];
   msg[0]=0;
-  msg[1]=edges;
-  write(sock, msg, 2);
+  msg[1]=edge;
+  write((int)socket, msg, 2); // Sending available edges to the client
+  while(true)
+  {
+    int r=recv((int)socket, msg, 1, 0);
+    if(r<1) return 0;
+    if(msg[0]==0)
+    {
+      int r=recv((int)socket, msg+1, 1, 0);
+      if(r<1) return 0;
+      //edge=0;
+      if(msg[1]<5&&msg[1]>0&&!connections[msg[1]-1])
+      {
+        //*Accepted, handle it
+        connections[msg[1]-1]=(int)socket;
+        msg[0]=2; // Confirm the request
+        msg[1]=true;
+        write((int)socket, msg, 2);
+        break;
+      }else{
+        msg[0]=2; // Decline the request, the client should request another port
+        msg[1]=false;
+        write((int)socket, msg, 2);
+      }
+    }else{
+      puts("Error! Only packettype 0 should be received by this part of the server");
+      return 0;
+    }
+  }
+  connections[edge-1]=(int)socket;
+  networkHandler(edge-1);
 }
 
 bool transferCreature(event eventobj)
