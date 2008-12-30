@@ -207,28 +207,30 @@ bool transferCreature(event eventobj)
   printf("network.so: Received event to transfer a creature on the %s, but networking is so far just a stub\n", eventobj.name+5);
 }
 
-int handleArg(int argc, const char** argv, int &i)
+int handleArg(int argc, const char** argv, int& i)
 {
   if(!strcmp(argv[i], "-connect")){
     if(i+1>=argc)
     {
       fputs("-connect: missing argument\n", stderr);
-      return 0;
+      exit(1);
     }
     i++;
     char* server=new char[strlen(argv[i])+1];
     strcpy(server, argv[i]);
     pthread_create(new pthread_t, NULL, networkConnect, server);
-    return 0;
+    return 1;
   }else if(!strcmp(argv[i], "-listen")){
     if(i+1>=argc)
     {
       fputs("-listen: missing argument\n", stderr);
-      return 0;
+      exit(1);
     }
     i++;
-    fputs("-listen: not yet implemented\n", stderr);
-    return 0;
+    char* port=new char[strlen(argv[i])+1];
+    strcpy(port, argv[i]);
+    pthread_create(new pthread_t, NULL, networkServer, port);
+    return 1;
   }else if(!strcmp(argv[i], "-help")){
     puts("-connect [server]:[port]          Connect to another virtual world to extend it geographically");
     puts("-listen [port]                    Listen for incoming connections to extend the virtual world");
