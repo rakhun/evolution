@@ -78,14 +78,19 @@ void creature::getCOL(unsigned char*& col, unsigned int& col_length)
   col_length=this->col_length;
 }
 
-void creature::getPosition(int& x, int& y)
+void creature::getPosition(float& x, float& y)
 {
   x=this->x;
   y=this->y;
 }
 
-void creature::setPosition(int x, int y)
+void creature::setPosition(float x, float y)
 {
   this->x=x;
   this->y=y;
+}
+
+float creature::getAngle()
+{
+  return angle;
 }

@@ -25,7 +25,7 @@ void draw(SDL_Surface* screen, SDL_Rect* bg)
   SDL_FillRect(screen, bg, 0x00E000);
   std::vector<creature*>* people=(std::vector<creature*>*)pointerobj->getPointerLock("creatures");
   if(!people) return;
-  int x, y;
+  float x, y;
   for(unsigned int i=0; i<people->size(); i++)
   {
     people->at(i)->getPosition(x, y);

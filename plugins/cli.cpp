@@ -84,7 +84,7 @@ void* commandinput(void* pointer)
         printf("%i creatures:\n", people->size());
         for(unsigned int i=0; i<people->size(); i++)
         {
-          int x, y;
+          float x, y;
           people->at(i)->getPosition(x, y);
           printf("X: %i, Y: %i, Health: %i\n", x, y, people->at(i)->getLife());
         }

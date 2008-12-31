@@ -76,7 +76,7 @@ int main(int argc, const char** argv)
     }
   }
 
-  int x, y;
+  float x, y;
   while(true)
   {
     pointers::getInstance()->getPointerLockWait("creatures");

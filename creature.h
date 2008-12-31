@@ -45,9 +45,11 @@ public:
   /// @param col_length Integer to assign the length of the creature's COL
   void getCOL(unsigned char*& col, unsigned int& col_length);
   /// Read the creature's position into two integers
-  void getPosition(int& x, int& y);
+  void getPosition(float& x, float& y);
   /// Moves the creature to the position provided
-  void setPosition(int x, int y);
+  void setPosition(float x, float y);
+  /// Returns which angle the creature is facing
+  float getAngle();
   /// Returns the creature's health value
   /// @return The health level of the creature
   int getLife(){return health;} 
