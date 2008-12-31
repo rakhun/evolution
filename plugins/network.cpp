@@ -38,6 +38,7 @@
 #include <unistd.h>
 #include "../pointers.h"
 #include "../eventmanager.h"
+#include "../creature.h"
 
 void* networkServer2(void*);
 
@@ -202,9 +203,66 @@ void* networkServer2(void* socket)
   networkHandler(edge-1);
 }
 
-bool transferCreature(event eventobj)
+bool transferCreature(int id, char edge)
 {
-  printf("network.so: Received event to transfer a creature on the %s, but networking is so far just a stub\n", eventobj.name+5);
+  std::vector<creature*>* creatures=(std::vector<creature*>*)pointerhub->getPointerLockWait("creatures");
+  if(!creatures) return false;
+  unsigned char* col;
+  unsigned int col_length;
+  creatures->at(id)->getCOL(col, col_length);
+  float x, y, angle, health;
+  creatures->at(id)->getPosition(x, y);
+  angle=creatures->at(id)->getAngle();
+  health=creatures->at(id)->getLife();
+  unsigned int size=sizeof(float)*3+sizeof(unsigned int)*2+sizeof(int)*2+sizeof(unsigned char)*(512+col_length);
+  void* msg=malloc(size);
+  unsigned int pos=0;
+  memcpy((void*)((size_t)msg+pos), &x, sizeof(x)); pos+=sizeof(x);
+  memcpy((void*)((size_t)msg+pos), &y, sizeof(y)); pos+=sizeof(y);
+  memcpy((void*)((size_t)msg+pos), &angle, sizeof(angle)); pos+=sizeof(angle);
+  memcpy((void*)((size_t)msg+pos), &col_length, sizeof(col_length)); pos+=sizeof(col_length);
+  memcpy((void*)((size_t)msg+pos), col, sizeof(unsigned char)*col_length); pos+=sizeof(unsigned char)*col_length;
+  pos+=sizeof(unsigned int); // pointer
+  pos+=sizeof(unsigned char)*512; // mem
+  pos+=sizeof(unsigned int); // mempointer
+  memcpy((void*)((size_t)msg+pos), &health, sizeof(health)); pos+=sizeof(health);
+/*
+ * 1	float x		Sending a creature across, same for client and server
+ *	float y
+ *	float angle
+ *	u_int col_len
+ *	u_char*x col
+ *	u_int pointer
+ *	u_char*512 mem
+ *	int mempointer
+ *	int health
+ *	(30 bytes total, float & int=4, char=1)
+ */
+  write(connections[edge], msg, size);
+}
+
+bool transferLeft(event eventobj)
+{
+  if(eventobj.integers.size()<1) return false; // Erroneous event
+  return transferCreature(eventobj.integers[0], 0);
+}
+
+bool transferTop(event eventobj)
+{
+  if(eventobj.integers.size()<1) return false; // Erroneous event
+  return transferCreature(eventobj.integers[0], 1);
+}
+
+bool transferRight(event eventobj)
+{
+  if(eventobj.integers.size()<1) return false; // Erroneous event
+  return transferCreature(eventobj.integers[0], 2);
+}
+
+bool transferBottom(event eventobj)
+{
+  if(eventobj.integers.size()<1) return false; // Erroneous event
+  return transferCreature(eventobj.integers[0], 3);
 }
 
 int handleArg(int argc, const char** argv, int& i)
@@ -244,9 +302,9 @@ extern "C" {
     pointerhub=pointersobj;
     connections[0]=connections[1]=connections[2]=connections[3]=0;
     ((std::vector<int (*)(int, const char**, int&)>*)pointersobj->getPointer("argHandlers"))->push_back(handleArg);
-    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp top", transferCreature);
-    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp bottom", transferCreature);
-    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp left", transferCreature);
-    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp right", transferCreature);
+    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp top", transferTop);
+    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp bottom", transferBottom);
+    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp left", transferLeft);
+    ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp right", transferRight);
   }
 }
