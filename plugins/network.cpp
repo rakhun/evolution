@@ -99,21 +99,24 @@ void* networkConnect(void* voidserver)
   while(true)
   {
     int r=recv(sock, msg, 1, 0);
-    if(r<1) return 0;
+    if(r<1){printf("Bad return value! (%i)\n", r); return 0;}
+    printf("Received packettype %i on socket %i\n", msg[0], sock);
     if(msg[0]==0) // Receiving a list of available edges, answering with a request to connect to one.
     {
       int r=recv(sock, msg+1, 1, 0);
-      if(r<1) return 0;
+      if(r<1){puts("Faulty packet!");return 0;}
+      printf("Received offers: %i\n", msg[1]);
       edge=0;
       if(msg[1]&1 &&!connections[0]) edge=1;
       else if(msg[1]&2 &&!connections[1]) edge=2;
       else if(msg[1]&4 &&!connections[2]) edge=3;
       else if(msg[1]&8 &&!connections[3]) edge=4;
       connections[edge-1]=sock;
+      printf("connections[%i]=sock(%i)\n", edge-1, sock);
       edgesoffered=msg[1];
       msg[0]=0;
       msg[1]=edge;
-      write(sock, msg, 2);
+      send(sock, msg, 2, MSG_DONTWAIT);
       if(!edge){close(sock); return 0;}
     }else if(msg[0]==2) // Confirmation or decline of request to connect to an edge, trying another edge if declined
     {
@@ -134,7 +137,7 @@ void* networkConnect(void* voidserver)
         connections[edge-1]=sock;
         msg[0]=0;
         msg[1]=edge;
-        write(sock, msg, 2);
+        send(sock, msg, 2, MSG_DONTWAIT);
         if(!edge){close(sock); return 0;}
       }else{
         break;
@@ -171,7 +174,7 @@ void* networkServer2(void* socket)
   char msg[2];
   msg[0]=0;
   msg[1]=edge;
-  write((int)socket, msg, 2); // Sending available edges to the client
+  send((int)socket, msg, 2, MSG_DONTWAIT); // Sending available edges to the client
   while(true)
   {
     int r=recv((int)socket, msg, 1, 0);
@@ -187,18 +190,19 @@ void* networkServer2(void* socket)
         connections[msg[1]-1]=(int)socket;
         msg[0]=2; // Confirm the request
         msg[1]=true;
-        write((int)socket, msg, 2);
+        send((int)socket, msg, 2, MSG_DONTWAIT);
         break;
       }else{
         msg[0]=2; // Decline the request, the client should request another port
         msg[1]=false;
-        write((int)socket, msg, 2);
+        send((int)socket, msg, 2, MSG_DONTWAIT);
       }
     }else{
       puts("Error! Only packettype 0 should be received by this part of the server");
       return 0;
     }
   }
+  printf("Server: Negotiated edge %i\n", edge-1);
   connections[edge-1]=(int)socket;
   networkHandler(edge-1);
 }
@@ -238,29 +242,43 @@ bool transferCreature(int id, char edge)
  *	int health
  *	(30 bytes total, float & int=4, char=1)
  */
-  write(connections[edge], msg, size);
+  send(connections[edge], msg, size, MSG_DONTWAIT);
+  free(msg);
+  pointerhub->unlockPointer("creatures");
 }
 
 bool transferLeft(event eventobj)
 {
+  puts("Attempting to send creature left...");
+  if(!connections[0]) return false; // No other world connected to that edge
+  puts("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 0);
 }
 
 bool transferTop(event eventobj)
 {
+  puts("Attempting to send creature up...");
+  if(!connections[1]) return false; // No other world connected to that edge
+  puts("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 1);
 }
 
 bool transferRight(event eventobj)
 {
+  puts("Attempting to send creature right...");
+  if(!connections[2]) return false; // No other world connected to that edge
+  puts("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 2);
 }
 
 bool transferBottom(event eventobj)
 {
+  puts("Attempting to send creature down...");
+  if(!connections[3]) return false; // No other world connected to that edge
+  puts("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 3);
 }
@@ -279,14 +297,15 @@ int handleArg(int argc, const char** argv, int& i)
     pthread_create(new pthread_t, NULL, networkConnect, server);
     return 1;
   }else if(!strcmp(argv[i], "-listen")){
+    char* port;
     if(i+1>=argc)
     {
-      fputs("-listen: missing argument\n", stderr);
-      exit(1);
+      port=(char*)"3526";
+    }else{
+      i++;
+      port=new char[strlen(argv[i])+1];
+      strcpy(port, argv[i]);
     }
-    i++;
-    char* port=new char[strlen(argv[i])+1];
-    strcpy(port, argv[i]);
     pthread_create(new pthread_t, NULL, networkServer, port);
     return 1;
   }else if(!strcmp(argv[i], "-help")){
