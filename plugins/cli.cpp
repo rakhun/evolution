@@ -58,6 +58,7 @@ void* commandinput(void* pointer)
         puts("create [type] [X] [Y] Creates a new creature at X, Y.");
         puts("                       Type=default or manual (using a default");
         puts("                       COL script or entering code manually)");
+        puts("ls                    List creatures and some values");
       }
       else if(!strcmp(argv[0], "create"))
       {
@@ -68,7 +69,30 @@ void* commandinput(void* pointer)
         }
         if(!strcmp("manual", argv[1]))
         {
-          puts("Manual creation not yet implemented.");
+          std::vector<char*> lines;
+          int size=0;
+          while(true)
+          {
+            char* r;
+            char* line=new char[128];
+            r=fgets(line, 128, stdin);
+            if(r==0||line[1]==0) break;
+            lines.push_back(line);
+            size+=strlen(line);
+          }
+          unsigned char* col=new unsigned char[size+1];
+          col[size]=0;
+          int pos=0;
+          for(int i=0; i<lines.size(); i++)
+          {
+            strcpy((char*)((int)col+pos), lines[i]);
+            pos+=strlen(lines[i]);
+          }
+          creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), col);
+          std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointerLockWait("creatures");
+          people->push_back(baby);
+          printf("Number of creatures in the people vector: %i\n", people->size());
+          ((pointers*)pointer)->unlockPointer("creatures");
         }else{ // Default to 'default'
           /// @todo Write some proper default code that actually does something.
           creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), (const unsigned char*)"0:FF\n0:FF\n1:80");
@@ -86,7 +110,10 @@ void* commandinput(void* pointer)
         {
           float x, y;
           people->at(i)->getPosition(x, y);
-          printf("X: %i, Y: %i, Health: %i\n", x, y, people->at(i)->getLife());
+          unsigned char* col;
+          unsigned int col_length;
+          people->at(i)->getCOL(col, col_length);
+          printf("X: %f, Y: %f, Health: %i, COL-length: %i\n", x, y, people->at(i)->getLife(), col_length);
         }
         ((pointers*)pointer)->unlockPointer("creatures");
       }
