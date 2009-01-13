@@ -39,6 +39,7 @@
 #include "../pointers.h"
 #include "../eventmanager.h"
 #include "../creature.h"
+#include "../log.h"
 
 void* networkServer2(void*);
 
@@ -54,13 +55,13 @@ void networkHandler(int connection)
     switch(packettype)
     {
     case 0:
-      puts("Error! packettype 0 should not appear here");
+      log("Error! packettype 0 should not appear here");
       return;
     case 1:
-      puts("Stub! got packettype 1 in networkHandler()");
+      log("Stub! got packettype 1 in networkHandler()");
       break;
     case 2:
-      puts("Error! packettype 2 should not appear here");
+      log("Error! packettype 2 should not appear here");
       return;
     }
   }
@@ -104,7 +105,7 @@ void* networkConnect(void* voidserver)
     if(msg[0]==0) // Receiving a list of available edges, answering with a request to connect to one.
     {
       int r=recv(sock, msg+1, 1, 0);
-      if(r<1){puts("Faulty packet!");return 0;}
+      if(r<1){log("Faulty packet!");return 0;}
       printf("Received offers: %i\n", msg[1]);
       edge=0;
       if(msg[1]&1 &&!connections[0]) edge=1;
@@ -198,11 +199,13 @@ void* networkServer2(void* socket)
         send((int)socket, msg, 2, MSG_DONTWAIT);
       }
     }else{
-      puts("Error! Only packettype 0 should be received by this part of the server");
+      log("Error! Only packettype 0 should be received by this part of the server");
       return 0;
     }
   }
-  printf("Server: Negotiated edge %i\n", edge-1);
+  char buf[28];
+  sprintf(buf, "Server: Negotiated edge %i\n", edge-1);
+  log(buf);
   connections[edge-1]=(int)socket;
   networkHandler(edge-1);
 }
@@ -249,36 +252,36 @@ bool transferCreature(int id, char edge)
 
 bool transferLeft(event eventobj)
 {
-  puts("Attempting to send creature left...");
+  log("Attempting to send creature left...");
   if(!connections[0]) return false; // No other world connected to that edge
-  puts("Proceeding");
+  log("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 0);
 }
 
 bool transferTop(event eventobj)
 {
-  puts("Attempting to send creature up...");
+  log("Attempting to send creature up...");
   if(!connections[1]) return false; // No other world connected to that edge
-  puts("Proceeding");
+  log("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 1);
 }
 
 bool transferRight(event eventobj)
 {
-  puts("Attempting to send creature right...");
+  log("Attempting to send creature right...");
   if(!connections[2]) return false; // No other world connected to that edge
-  puts("Proceeding");
+  log("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 2);
 }
 
 bool transferBottom(event eventobj)
 {
-  puts("Attempting to send creature down...");
+  log("Attempting to send creature down...");
   if(!connections[3]) return false; // No other world connected to that edge
-  puts("Proceeding");
+  log("Proceeding");
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 3);
 }

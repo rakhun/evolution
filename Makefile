@@ -7,6 +7,7 @@ files = $(wildcard *.cpp)
 pluginfiles = plugins/test.cpp
 pluginfiles += plugins/network.cpp
 pluginfiles += plugins/cli.cpp
+pluginfiles += plugins/log.cpp
 ifdef USE_SDL
 pluginfiles += plugins/sdl_display.cpp
 endif

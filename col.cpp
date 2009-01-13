@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include <math.h>
 #include "creature.h"
+#include "pointers.h"
+#include "eventmanager.h"
+#include "log.h"
 
 void creature::execute()
 {
@@ -74,7 +77,9 @@ void creature::execute()
   case 11:
     break;
   default:
-    printf("Command not implemented: %i\n", col[pointer]);
+    char msg[32];
+    sprintf(msg, "Command not implemented: %i\n", col[pointer]);
+    log(msg);
   }
   pointer++;
   if(pointer>=col_length) pointer-=col_length;
