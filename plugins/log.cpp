@@ -28,6 +28,7 @@ extern "C" {
     ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("log", writelog);
   }
 
+  __attribute__((destructor))
   void endplugin()
   {
     if(logfile) fclose(logfile);
