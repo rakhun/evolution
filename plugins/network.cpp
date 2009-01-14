@@ -329,4 +329,13 @@ extern "C" {
     ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp left", transferLeft);
     ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp right", transferRight);
   }
+
+  __attribute__((destructor))
+  void endplugin()
+  {
+    if(connections[0]) close(connections[0]);
+    if(connections[1]) close(connections[1]);
+    if(connections[2]) close(connections[2]);
+    if(connections[3]) close(connections[3]);
+  }
 }

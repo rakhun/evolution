@@ -124,8 +124,16 @@ void* commandinput(void* pointer)
   }
 }
 
-extern "C" void initplugin(pointers* pointerobj)
-{
-  pthread_t thread;
-  pthread_create(&thread, NULL, commandinput, pointerobj);
+extern "C" {
+  void initplugin(pointers* pointerobj)
+  {
+    pthread_t thread;
+    pthread_create(&thread, NULL, commandinput, pointerobj);
+  }
+
+  __attribute__((destructor))
+  void endplugin()
+  {
+    puts(""); // Just print a newline so the shell won't begin on the same line
+  }
 }
