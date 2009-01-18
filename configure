@@ -1,4 +1,40 @@
 (
+echo "# Generated with: $0 $@"
+for flag in $@; do
+  if [ "${flag:0:9}" = "--prefix=" ]; then
+    echo "PREFIX = ${flag:9}"
+  elif [ "${flag:0:7}" = "--host=" ]; then
+    echo "HOST = ${flag:7}"
+    HOST="${flag:7}"
+  else
+    echo "Warning: unknown flag ${$flag}" >&2
+  fi
+done
+
+if [ -z "$CXX" -a ! -z "$HOST" ]; then
+  echo -n "Checking for ${HOST}-g++... " >&2
+  if [ "$(which "${HOST}-g++" 2> /dev/null)" = "" ]; then
+    echo "no" >&2
+  else
+    echo "yes" >&2
+    CXX="${HOST}-g++"
+  fi
+fi
+
+if [ -z "$CXX" ]; then
+  echo -n "Checking for g++... " >&2
+  if [ "$(which "g++" 2> /dev/null)" = "" ]; then
+    echo "no" >&2
+    echo "You need g++ to compile EvolutionBots" >&2
+    exit 1
+  else
+    echo "yes" >&2
+    CXX="g++"
+  fi
+fi
+
+echo "CXX = ${CXX}"
+
 echo -n "Checking for sdl-config... " >&2
 if [ "$(which sdl-config 2> /dev/null)" = "" ]; then
 echo "No" >&2
@@ -10,12 +46,11 @@ fi
 echo -n "Checking for SDL... " >&2
 echo "#include <SDL/SDL.h>
 int main(){}" > /tmp/sdltest.c
-gcc /tmp/sdltest.c $(sdl-config --libs) $(sdl-config --cflags) -o /tmp/sdltest 2> /dev/null && (
+${CXX} /tmp/sdltest.c $(sdl-config --libs) $(sdl-config --cflags) -o /tmp/sdltest 2> /dev/null && (
 echo "USE_SDL = Yes"
 echo "SDLFLAGS = $(sdl-config --cflags) $(sdl-config --libs)"
 echo "Yes" >&2
 ) || echo "No" >&2
 rm -f /tmp/sdltest /tmp/sdltest.c
 
-#other test
 ) > Makeconfig
