@@ -33,21 +33,24 @@ int main(int argc, const char** argv)
   pointers::getInstance()->addPointer(&worldinfo, "world");
 
   DIR* pluginfiles=opendir("plugins"); ///< @todo Make it relative to the executable's location instead of current location
-  struct dirent* file;
-  while(file=readdir(pluginfiles))
+  if(pluginfiles)
   {
-    if(!strcmp(".so", file->d_name+strlen(file->d_name)-3)) ///< @todo Cross platform library filename extensions
+    struct dirent* file;
+    while(file=readdir(pluginfiles))
     {
-      char filename[strlen(file->d_name)+9];
-      sprintf(filename, "plugins/%s", file->d_name);
-      #ifdef debug
-      printf("Loading plugin: %s\n", filename);
-      #endif
-      void* handle=dlopen(filename, RTLD_LAZY);
-      if(!handle){fprintf(stderr, "Failed to load plugin '%s': %s\n", file->d_name, dlerror()); continue;}
-      void (*initplugin)(pointers*)=(void (*)(pointers*))dlsym(handle, "initplugin");
-      if(const char* error=dlerror()){fprintf(stderr, "Failed to initialize plugin '%s': %s\n", file->d_name, error); dlclose(handle); continue;}
-      initplugin(pointers::getInstance());
+      if(!strcmp(".so", file->d_name+strlen(file->d_name)-3)) ///< @todo Cross platform library filename extensions
+      {
+        char filename[strlen(file->d_name)+9];
+        sprintf(filename, "plugins/%s", file->d_name);
+        #ifdef debug
+        printf("Loading plugin: %s\n", filename);
+        #endif
+        void* handle=dlopen(filename, RTLD_LAZY);
+        if(!handle){fprintf(stderr, "Failed to load plugin '%s': %s\n", file->d_name, dlerror()); continue;}
+        void (*initplugin)(pointers*)=(void (*)(pointers*))dlsym(handle, "initplugin");
+        if(const char* error=dlerror()){fprintf(stderr, "Failed to initialize plugin '%s': %s\n", file->d_name, error); dlclose(handle); continue;}
+        initplugin(pointers::getInstance());
+      }
     }
   }
 
