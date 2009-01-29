@@ -35,6 +35,17 @@ fi
 
 echo "CXX = ${CXX}"
 
+[ -z "$HOST" ] && export HOST="$(uname -m)-$(uname -s)"
+if [ "$(echo "${HOST}" | grep -i "mingw")" != "" ]; then
+  echo "You appear to be compiling for winblows, executables will end in .exe and libraries will end in .dll (though it probably won't work on that platform anyway)" >&2
+  echo "EXEEXT = .exe"
+  echo "LIBEXT = .dll"
+fi
+if [ "$(echo "${HOST}" | grep -i "darwin")" != "" ]; then
+  echo "You appear to be compiling for OS X, libraries will end in .dylib" >&2
+  echo "LIBEXT = .dylib"
+fi
+
 echo -n "Checking for sdl-config... " >&2
 if [ "$(which sdl-config 2> /dev/null)" = "" ]; then
 echo "No" >&2
