@@ -1,8 +1,16 @@
 ifeq "$(shell [ -e Makeconfig ] && echo Makeconfig)" "Makeconfig"
 include Makeconfig
 endif
-CXXFLAGS += -g
+ifndef EXEEXT
+EXEEXT = 
+endif
+ifndef LIBEXT
+LIBEXT = .so
+endif
+CXXFLAGS += -g -O2
+LFLAGS += -L. "-Wl,-R$(shell pwd)"
 files = $(wildcard *.cpp)
+files := $(files:main.cpp=)
 
 pluginfiles = plugins/test.cpp
 pluginfiles += plugins/network.cpp
@@ -12,13 +20,16 @@ ifdef USE_SDL
 pluginfiles += plugins/sdl_display.cpp
 endif
 
-all: EvolutionBots $(pluginfiles:.cpp=.so) docs
+all: EvolutionBots$(EXEEXT) $(pluginfiles:.cpp=.so) docs
 
 debug:
 	CXXFLAGS="-Ddebug" make --no-print-directory
 
-EvolutionBots: $(files:%.cpp=out/%.o)
-	$(CXX) $(CXXFLAGS) $(files:%.cpp=out/%.o) -ldl -o EvolutionBots
+EvolutionBots$(EXEEXT): out/main.o libevolve$(LIBEXT)
+	$(CXX) $(CXXFLAGS) $(LFLAGS) out/main.o -levolve -ldl -o EvolutionBots$(EXEEXT)
+
+libevolve$(LIBEXT): $(files:%.cpp=out/%.o)
+	$(CXX) -shared $(files:%.cpp=out/%.o) -o libevolve$(LIBEXT)
 
 out/%.o: %.cpp
 	@if [ ! -e out ]; then mkdir out; fi
@@ -37,7 +48,7 @@ test:
 	cd tests && make
 
 clean:
-	rm -rf docs out EvolutionBots
+	rm -rf docs out EvolutionBots$(EXEEXT) libevolve$(LIBEXT)
 	cd tests && make clean
 	cd plugins && make clean
 

@@ -1,27 +1,28 @@
 ifeq "$(shell [ -e ../Makeconfig ] && echo Makeconfig)" "Makeconfig"
 include ../Makeconfig
 endif
+ifndef EXEEXT
+EXEEXT = 
+endif
+ifndef LIBEXT
+LIBEXT = .so
+endif
 files = $(wildcard *.cpp)
 ifndef SDLFLAGS
 SDLFLAGS = -lSDL
 endif
 
-all: $(files:.cpp=.so)
+all: $(files:.cpp=$(LIBEXT))
 
-sdl_display.so: sdl_display.cpp ../out/pointers.o ../out/creature.o
-	$(CXX) $(CXXFLAGS) -shared sdl_display.cpp $(SDLFLAGS) -pthread ../out/pointers.o ../out/creature.o -o sdl_display.so
+sdl_display$(LIBEXT): sdl_display.cpp ../libevolve$(LIBEXT)
+	$(CXX) $(CXXFLAGS) -shared sdl_display.cpp $(SDLFLAGS) -pthread -L.. -levolve -o sdl_display$(LIBEXT)
 
-cli.so: cli.cpp ../out/pointers.o ../out/creature.o
-	$(CXX) $(CXXFLAGS) -shared cli.cpp -pthread ../out/pointers.o ../out/creature.o -o cli.so
+%$(LIBEXT): %.cpp ../libevolve$(LIBEXT)
+	$(CXX) $(CXXFLAGS) -shared $< -L.. -levolve $(shell [ -e "$(@:%$(LIBEXT)=%.flags)" ] && cat "$(@:%$(LIBEXT)=%.flags)") -o $@
 
-network.so: network.cpp ../out/pointers.o ../out/creature.o ../out/eventmanager.o
-	$(CXX) $(CXXFLAGS) -shared network.cpp -pthread ../out/pointers.o ../out/creature.o ../out/eventmanager.o -o network.so
 
-%.so: %.cpp ../out/pointers.o ../out/eventmanager.o
-	$(CXX) $(CXXFLAGS) -shared $< ../out/pointers.o ../out/eventmanager.o -o $@
-
-../out/%.o: ../%.cpp
-	cd .. && make "$$(echo "$@" | sed -e "s/^..\///;")"
+../libevolve$(LIBEXT):
+	cd .. && make libevolve$(LIBEXT)
 
 clean:
 	rm -f $(files:.cpp=.so)
