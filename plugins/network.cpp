@@ -161,7 +161,7 @@ void* networkServer(void* portstring)
   socklen_t addrlen=sizeof(sockaddr);
   while(int client=accept(sock, (struct sockaddr*)&clientinfo, &addrlen)>=0)
   {
-    pthread_create(new pthread_t, NULL, networkServer2, (void*)client);
+    pthread_create(new pthread_t, NULL, networkServer2, new int(client));
   }
 }
 
@@ -175,38 +175,48 @@ void* networkServer2(void* socket)
   char msg[2];
   msg[0]=0;
   msg[1]=edge;
-  send((int)socket, msg, 2, MSG_DONTWAIT); // Sending available edges to the client
+  send(*(int*)socket, msg, 2, MSG_DONTWAIT); // Sending available edges to the client
   while(true)
   {
-    int r=recv((int)socket, msg, 1, 0);
-    if(r<1) return 0;
+    int r=recv(*(int*)socket, msg, 1, 0);
+    if(r<1)
+    {
+      delete (int*)socket;
+      return 0;
+    }
     if(msg[0]==0)
     {
-      int r=recv((int)socket, msg+1, 1, 0);
-      if(r<1) return 0;
+      int r=recv(*(int*)socket, msg+1, 1, 0);
+      if(r<1)
+      {
+        delete (int*)socket;
+        return 0;
+      }
       //edge=0;
       if(msg[1]<5&&msg[1]>0&&!connections[msg[1]-1])
       {
         //*Accepted, handle it
-        connections[msg[1]-1]=(int)socket;
+        connections[msg[1]-1]=*(int*)socket;
         msg[0]=2; // Confirm the request
         msg[1]=true;
-        send((int)socket, msg, 2, MSG_DONTWAIT);
+        send(*(int*)socket, msg, 2, MSG_DONTWAIT);
         break;
       }else{
         msg[0]=2; // Decline the request, the client should request another port
         msg[1]=false;
-        send((int)socket, msg, 2, MSG_DONTWAIT);
+        send(*(int*)socket, msg, 2, MSG_DONTWAIT);
       }
     }else{
       log("Error! Only packettype 0 should be received by this part of the server");
+      delete (int*)socket;
       return 0;
     }
   }
   char buf[28];
   sprintf(buf, "Server: Negotiated edge %i\n", edge-1);
   log(buf);
-  connections[edge-1]=(int)socket;
+  connections[edge-1]=*(int*)socket;
+  delete (int*)socket;
   networkHandler(edge-1);
 }
 
