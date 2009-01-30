@@ -14,9 +14,9 @@ done
 if [ -z "$CXX" -a ! -z "$HOST" ]; then
   echo -n "Checking for ${HOST}-g++... " >&2
   if [ "$(which "${HOST}-g++" 2> /dev/null)" = "" ]; then
-    echo "no" >&2
+    echo "No" >&2
   else
-    echo "yes" >&2
+    echo "Yes" >&2
     CXX="${HOST}-g++"
   fi
 fi
@@ -24,11 +24,11 @@ fi
 if [ -z "$CXX" ]; then
   echo -n "Checking for g++... " >&2
   if [ "$(which "g++" 2> /dev/null)" = "" ]; then
-    echo "no" >&2
+    echo "No" >&2
     echo "You need g++ to compile EvolutionBots" >&2
     exit 1
   else
-    echo "yes" >&2
+    echo "Yes" >&2
     CXX="g++"
   fi
 fi
@@ -44,6 +44,15 @@ fi
 if [ "$(echo "${HOST}" | grep -i "darwin")" != "" ]; then
   echo "You appear to be compiling for OS X, libraries will end in .dylib" >&2
   echo "LIBEXT = .dylib"
+fi
+
+echo -n "Checking if we need -fPIC for shared libraries... " >&2
+if echo "int a(){}" | gcc -x c -shared - -o /tmp/libconftest.so 2> /dev/null; then
+  echo "No" >&2
+  rm -f /tmp/libconftest.so
+else
+  echo "Yes" >&2
+  echo "CXXFLAGS += -fPIC"
 fi
 
 echo -n "Checking for sdl-config... " >&2
