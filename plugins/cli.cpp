@@ -85,7 +85,7 @@ void* commandinput(void* pointer)
           int pos=0;
           for(int i=0; i<lines.size(); i++)
           {
-            strcpy((char*)((int)col+pos), lines[i]);
+            strcpy((char*)(pos+col), lines[i]);
             pos+=strlen(lines[i]);
           }
           creature* baby=new creature(atoi(argv[2]), atoi(argv[3]), col);

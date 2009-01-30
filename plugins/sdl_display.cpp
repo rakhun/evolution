@@ -31,8 +31,8 @@ void draw(SDL_Surface* screen, SDL_Rect* bg)
     people->at(i)->getPosition(x, y);
     SDL_Rect dummy; /// @todo This should be a picture or something, not just a square
     dummy.w=dummy.h=20;
-    dummy.x=x-10;
-    dummy.y=y-10;
+    dummy.x=int(x)-10;
+    dummy.y=int(y)-10;
     SDL_FillRect(screen, &dummy, 0xFFFFFF);
   }
   pointerobj->unlockPointer("creatures");

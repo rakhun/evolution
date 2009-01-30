@@ -57,7 +57,7 @@ void* pointers::getPointerLockWait(const char* name)
   {
     if(!strcmp(name, pointerlist[i].name))
     {
-      while(pointerlist[i].locked) sleep(0.001);
+      while(pointerlist[i].locked) usleep(1);
       pointerlist[i].locked=true;
       return pointerlist[i].pointer;
     }
