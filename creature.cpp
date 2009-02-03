@@ -14,9 +14,19 @@
 #include <vector>
 #include <string.h>
 #include "creature.h"
+#include "object.h"
+#include "pointers.h"
 
 creature::creature(int x, int y, const unsigned char* code)
 {
+  Object** tmpobj=(Object**)pointers::getInstance()->getPointerLockWait("objects");
+  if(!tmpobj)
+  {
+    /* Log this error */
+  }else{
+    this->next=*tmpobj;
+    *tmpobj=this;
+  }
   this->x=x;
   this->y=y;
   const unsigned char* pos=code;
