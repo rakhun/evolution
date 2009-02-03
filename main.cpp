@@ -18,6 +18,7 @@
 #include "pointers.h"
 #include "eventmanager.h"
 #include "world.h"
+#include "object.h"
 
 int main(int argc, const char** argv)
 {
@@ -31,6 +32,7 @@ int main(int argc, const char** argv)
   pointers::getInstance()->addPointer(&argHandlers, "argHandlers");
   pointers::getInstance()->addPointer(&people, "creatures");
   pointers::getInstance()->addPointer(&worldinfo, "world");
+  pointers::getInstance()->addPointer(&Object::iter, "objects");
 
   DIR* pluginfiles=opendir("plugins"); ///< @todo Make it relative to the executable's location instead of current location
   if(pluginfiles)

@@ -8,17 +8,6 @@
  *
  * You should have received a copy of the GNU General Public License along with this program; if not, see <http://www.gnu.org/licenses>.
  */
-#ifndef EVOLUTION_object_dot_h
-#define EVOLUTION_object_dot_h
+#include "object.h"
 
-/// Base object class which creatures and inanimate objects inherit from
-class Object
-{
-protected:
-  float x; ///< X position of the object
-  float y; ///< Y position of the object
-public:
-  static Object* iter; ///< Pointer to the first object in the iterator list
-  Object* next; ///< Pointer to the next object in the list
-};
-#endif
+Object* Object::iter=0;
