@@ -31,6 +31,9 @@ private:
     if(value>='A'&&value<='F') return value-'A'+10;
     return 255; // = error
   }
+
+  void writeVisual(unsigned char* mem, int mempointer, int resolution);
+
 public:
   /// Create a new creature with pre-set data
   /// @param x The new creature's X coordinate
