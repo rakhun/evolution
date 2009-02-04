@@ -13,6 +13,7 @@
 /// @brief Code for interpreting COL (Code Of Life)
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include "creature.h"
 #include "pointers.h"
 #include "eventmanager.h"
@@ -83,4 +84,25 @@ void creature::execute()
   }
   pointer++;
   if(pointer>=col_length) pointer-=col_length;
+}
+
+void creature::writeVisual(unsigned char* mem, int mempointer, int resolution)
+{
+  /* Loop through objects and get position in memory based on angle */
+  /* We also need to assure that objects further away don't overwrite closer objects */
+  Object** tmpobj=(Object**)pointers::getInstance()->getPointerLockWait("objects");
+  if(!tmpobj) return; // Blind!
+  Object* objiter=*tmpobj;
+  unsigned int distance[resolution];
+  memset(distance, 255, sizeof(unsigned int)*resolution);
+  while(objiter)
+  {
+    float X,Y;
+    objiter->getPosition(X, Y);
+    /* Calculate angle of this object relative to 'this'. */
+    float objangle=acosf((Y-this->y)/(X-this->x));
+    /* Chceck if the distance to the object is less than  */
+    /*   distance[resolution*angle/MAX_ANGLE]             */
+    objiter=objiter->next;
+  }
 }

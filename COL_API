@@ -9,7 +9,8 @@ Command		Argument	Description
 0 Walk		Length (x-128)	Walk, longer distance gives higher health penalty
 1 Turn		Angle (x-128)	Turn $Angle/256 of a rotation from the current angle
 2 Jump		Length (x-128)	Jump $Length steps with the pointer
-3 Look		?		Write visual information to memory
+3 Look		Datasize	Write visual information to memory, scaling
+				resolution to fit the datasize.
 4 Mempointer	Length (x-128)	Move the memory pointer $Length steps
 5 If		Value		Execute the following command if mem[$memP]=$Value
 6 IfNot		Value		Execute the following command if mem[$memP]!=$Value
