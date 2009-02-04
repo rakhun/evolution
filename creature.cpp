@@ -27,6 +27,7 @@ creature::creature(int x, int y, const unsigned char* code)
     this->next=*tmpobj;
     *tmpobj=this;
   }
+  pointers::getInstance()->unlockPointer("objects");
   this->x=x;
   this->y=y;
   const unsigned char* pos=code;
@@ -86,18 +87,6 @@ void creature::getCOL(unsigned char*& col, unsigned int& col_length)
 {
   col=this->col;
   col_length=this->col_length;
-}
-
-void creature::getPosition(float& x, float& y)
-{
-  x=this->x;
-  y=this->y;
-}
-
-void creature::setPosition(float x, float y)
-{
-  this->x=x;
-  this->y=y;
 }
 
 float creature::getAngle()

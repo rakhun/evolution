@@ -11,3 +11,15 @@
 #include "object.h"
 
 Object* Object::iter=0;
+
+void Object::getPosition(float& x, float& y)
+{
+  x=this->x;
+  y=this->y;
+}
+
+void Object::setPosition(float x, float y)
+{
+  this->x=x;
+  this->y=y;
+}
