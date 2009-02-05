@@ -87,10 +87,4 @@ extern "C" {
     pthread_t thread;
     pthread_create(&thread, NULL, SDL_Display, pointerobj);
   }
-
-  __attribute__((destructor))
-  void endplugin()
-  {
-    SDL_Quit();
-  }
 }
