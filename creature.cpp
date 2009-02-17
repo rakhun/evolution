@@ -30,6 +30,7 @@ creature::creature(int x, int y, const unsigned char* code)
   pointers::getInstance()->unlockPointer("objects");
   this->x=x;
   this->y=y;
+  this->objType=1;
   const unsigned char* pos=code;
   std::vector<unsigned char> commands;
   std::vector<unsigned char> args;

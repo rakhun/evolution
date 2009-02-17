@@ -17,6 +17,7 @@ class Object
 protected:
   float x; ///< X position of the object
   float y; ///< Y position of the object
+  unsigned char objType; ///< Type of object, will be used as the "color" of the object
 public:
   static Object* iter; ///< Pointer to the first object in the iterator list
   Object* next; ///< Pointer to the next object in the list
@@ -25,5 +26,7 @@ public:
   void getPosition(float& x, float& y);
   /// Moves the object to the position specified
   void setPosition(float x, float y);
+  /// Getting what type of object it is
+  unsigned char getType();
 };
 #endif

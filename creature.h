@@ -57,5 +57,7 @@ public:
   void die(){health=0;}
   /// Execute the current command currently pointed at and increment the pointer
   void execute();
+  /// Return what value/"color" creatures will see this creature as
+  unsigned char getType();
 };
 #endif

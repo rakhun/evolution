@@ -23,3 +23,8 @@ void Object::setPosition(float x, float y)
   this->x=x;
   this->y=y;
 }
+
+unsigned char Object::getType()
+{
+  return objType;
+}
