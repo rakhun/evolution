@@ -122,15 +122,18 @@ void creature::writeVisual(unsigned char* mem, int mempointer, int resolution)
       if(Y-this->y<0) objangle=M_PIl*2+objangle;
       if(objangle>=M_PIl*2) objangle-=M_PIl*2;
     }
-    int angleindex=resolution*(objangle>angle?objangle-angle:objangle-angle+M_PIl*2)/(M_PIl*2);
-    /* Chceck if the distance to the object is less than  */
-    /*   distance[resolution*angle/MAX_ANGLE]             */
-    float thisdistance=sqrtf((Y-this->y)*(Y-this->y)+(X-this->x)*(X-this->x));
-    if(thisdistance<distance[angleindex])
+    if(fabs(objangle-angle)<=1.5)
     {
-      /* Store the image of this object in memory and note its distance */
-      distance[angleindex]=thisdistance;
-      mem[mempointer+angleindex]=objiter->getType();
+      int angleindex=resolution*(objangle-angle+1.5)/3;
+      /* Chceck if the distance to the object is less than  */
+      /*   distance[resolution*angle/MAX_ANGLE]             */
+      float thisdistance=sqrtf((Y-this->y)*(Y-this->y)+(X-this->x)*(X-this->x));
+      if(thisdistance<distance[angleindex])
+      {
+        /* Store the image of this object in memory and note its distance */
+        distance[angleindex]=thisdistance;
+        mem[mempointer+angleindex]=objiter->getType();
+      }
     }
     objiter=objiter->next;
   }
