@@ -344,9 +344,25 @@ extern "C" {
   __attribute__((destructor))
   void endplugin()
   {
-    if(connections[0]) close(connections[0]);
-    if(connections[1]) close(connections[1]);
-    if(connections[2]) close(connections[2]);
-    if(connections[3]) close(connections[3]);
+    if(connections[0])
+    {
+      shutdown(connections[0], 3);
+      close(connections[0]);
+    }
+    if(connections[1])
+    {
+      shutdown(connections[1], 3);
+      close(connections[1]);
+    }
+    if(connections[2])
+    {
+      shutdown(connections[2], 3);
+      close(connections[2]);
+    }
+    if(connections[3])
+    {
+      shutdown(connections[3], 3);
+      close(connections[3]);
+    }
   }
 }
