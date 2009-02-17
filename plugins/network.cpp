@@ -86,7 +86,7 @@ void* networkConnect(void* voidserver)
   sockaddr.sin_family=AF_INET;
   sockaddr.sin_addr.s_addr=inet_addr(server);
   sockaddr.sin_port=htons(port);
-  if(int r=connect(sock, (const struct sockaddr*)&sockaddr, sizeof(sockaddr)))
+  if(int r=connect(sock, (const struct sockaddr*)&sockaddr, sizeof(struct sockaddr_in)))
   {
     printf("failed (%i)\n", r);
     return false;
@@ -155,11 +155,12 @@ void* networkServer(void* portstring)
   sockaddr.sin_family=AF_INET;
   sockaddr.sin_addr.s_addr=INADDR_ANY;
   sockaddr.sin_port=htons(atoi((const char*)portstring));
-  bind(sock, (const struct sockaddr*)&sockaddr, sizeof(sockaddr));
+  bind(sock, (const struct sockaddr*)&sockaddr, sizeof(struct sockaddr_in));
   listen(sock, 6);
   struct sockaddr_in clientinfo;
-  socklen_t addrlen=sizeof(sockaddr);
-  while(int client=accept(sock, (struct sockaddr*)&clientinfo, &addrlen)>=0)
+  socklen_t addrlen=sizeof(sockaddr_in);
+  int client;
+  while((client=accept(sock, (struct sockaddr*)&clientinfo, &addrlen))>=0)
   {
     pthread_create(new pthread_t, NULL, networkServer2, new int(client));
   }
@@ -175,7 +176,7 @@ void* networkServer2(void* socket)
   char msg[2];
   msg[0]=0;
   msg[1]=edge;
-  send(*(int*)socket, msg, 2, MSG_DONTWAIT); // Sending available edges to the client
+  write(*(int*)socket, msg, 2); // Sending available edges to the client
   while(true)
   {
     int r=recv(*(int*)socket, msg, 1, 0);
