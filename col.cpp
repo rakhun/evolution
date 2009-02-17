@@ -93,8 +93,10 @@ void creature::writeVisual(unsigned char* mem, int mempointer, int resolution)
   Object** tmpobj=(Object**)pointers::getInstance()->getPointerLockWait("objects");
   if(!tmpobj) return; // Blind!
   Object* objiter=*tmpobj;
-  unsigned int distance[resolution];
-  memset(distance, 255, sizeof(unsigned int)*resolution);
+  if(mempointer+resolution>=512) resolution=512-mempointer-1;
+  if(resolution<0) return; // We're probably trying to write the visual data at the very end of the memory, causing it to be set back to -1
+  unsigned int distance[resolution+1];
+  memset(distance, 255, sizeof(unsigned int)*(resolution+1));
   while(objiter)
   {
     float X,Y;
