@@ -78,9 +78,8 @@ void creature::execute()
   case 11:
     break;
   default:
-    char msg[32];
-    sprintf(msg, "Command not implemented: %i\n", col[pointer]);
-    log(msg);
+    log "Command not implemented: %i\n", col[pointer]
+    endlog;
   }
   pointer++;
   if(pointer>=col_length) pointer-=col_length;

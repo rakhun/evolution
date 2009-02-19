@@ -1,7 +1,10 @@
 #ifndef log
-#define log(msg) \
+#define log \
   {event logmsg; \
   logmsg.name="log"; \
-  logmsg.strings.push_back(msg); \
+  char* log_msg; \
+  asprintf(&log_msg,
+#define endlog );\
+  logmsg.strings.push_back(log_msg); \
   ((eventManager*)pointers::getInstance()->getPointer("eventManager"))->triggerEvent(logmsg);}
 #endif
