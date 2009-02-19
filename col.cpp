@@ -78,8 +78,7 @@ void creature::execute()
   case 11:
     break;
   default:
-    log "Command not implemented: %i\n", col[pointer]
-    endlog;
+    log "Command not implemented: %i\n", col[pointer] endlog;
   }
   pointer++;
   if(pointer>=col_length) pointer-=col_length;

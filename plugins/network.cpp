@@ -55,13 +55,13 @@ void networkHandler(int connection)
     switch(packettype)
     {
     case 0:
-      log("Error! packettype 0 should not appear here");
+      log "Error! packettype 0 should not appear here" endlog;
       return;
     case 1:
-      log("Stub! got packettype 1 in networkHandler()");
+      log "Stub! got packettype 1 in networkHandler()" endlog;
       break;
     case 2:
-      log("Error! packettype 2 should not appear here");
+      log "Error! packettype 2 should not appear here" endlog;
       return;
     }
   }
@@ -100,20 +100,20 @@ void* networkConnect(void* voidserver)
   while(true)
   {
     int r=recv(sock, msg, 1, 0);
-    if(r<1){printf("Bad return value! (%i)\n", r); return 0;}
-    printf("Received packettype %i on socket %i\n", msg[0], sock);
+    if(r<1){log "Bad return value! (%i)\n", r endlog; return 0;}
+    log "Received packettype %i on socket %i\n", msg[0], sock endlog;
     if(msg[0]==0) // Receiving a list of available edges, answering with a request to connect to one.
     {
       int r=recv(sock, msg+1, 1, 0);
-      if(r<1){log("Faulty packet!");return 0;}
-      printf("Received offers: %i\n", msg[1]);
+      if(r<1){log "Faulty packet!" endlog;return 0;}
+      log "Received offers: %i\n", msg[1] endlog;
       edge=0;
       if(msg[1]&1 &&!connections[0]) edge=1;
       else if(msg[1]&2 &&!connections[1]) edge=2;
       else if(msg[1]&4 &&!connections[2]) edge=3;
       else if(msg[1]&8 &&!connections[3]) edge=4;
       connections[edge-1]=sock;
-      printf("connections[%i]=sock(%i)\n", edge-1, sock);
+      log "connections[%i]=sock(%i)\n", edge-1, sock endlog;
       edgesoffered=msg[1];
       msg[0]=0;
       msg[1]=edge;
@@ -141,6 +141,7 @@ void* networkConnect(void* voidserver)
         send(sock, msg, 2, MSG_DONTWAIT);
         if(!edge){close(sock); return 0;}
       }else{
+        log "Link to edge %i confirmed\n", edge endlog;
         break;
       }
     }
@@ -198,6 +199,7 @@ void* networkServer2(void* socket)
       {
         //*Accepted, handle it
         connections[msg[1]-1]=*(int*)socket;
+        log "Accepting link request to edge %i\n", msg[1] endlog;
         msg[0]=2; // Confirm the request
         msg[1]=true;
         send(*(int*)socket, msg, 2, MSG_DONTWAIT);
@@ -208,14 +210,12 @@ void* networkServer2(void* socket)
         send(*(int*)socket, msg, 2, MSG_DONTWAIT);
       }
     }else{
-      log("Error! Only packettype 0 should be received by this part of the server");
+      log "Error! Only packettype 0 should be received by this part of the server" endlog;
       delete (int*)socket;
       return 0;
     }
   }
-  char buf[28];
-  sprintf(buf, "Server: Negotiated edge %i\n", edge-1);
-  log(buf);
+  log "Server: Negotiated edge %i\n", edge-1 endlog;
   connections[edge-1]=*(int*)socket;
   delete (int*)socket;
   networkHandler(edge-1);
@@ -223,6 +223,7 @@ void* networkServer2(void* socket)
 
 bool transferCreature(int id, char edge)
 {
+  log "Trying to transfer creature %i to edge %i\n", id, edge endlog;
   std::vector<creature*>* creatures=(std::vector<creature*>*)pointerhub->getPointerLockWait("creatures");
   if(!creatures) return false;
   unsigned char* col;
@@ -263,36 +264,36 @@ bool transferCreature(int id, char edge)
 
 bool transferLeft(event eventobj)
 {
-  log("Attempting to send creature left...");
+  log "Attempting to send creature left..." endlog;
   if(!connections[0]) return false; // No other world connected to that edge
-  log("Proceeding");
+  log "Proceeding" endlog;
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 0);
 }
 
 bool transferTop(event eventobj)
 {
-  log("Attempting to send creature up...");
+  log "Attempting to send creature up..." endlog;
   if(!connections[1]) return false; // No other world connected to that edge
-  log("Proceeding");
+  log "Proceeding" endlog;
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 1);
 }
 
 bool transferRight(event eventobj)
 {
-  log("Attempting to send creature right...");
+  log "Attempting to send creature right..." endlog;
   if(!connections[2]) return false; // No other world connected to that edge
-  log("Proceeding");
+  log "Proceeding" endlog;
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 2);
 }
 
 bool transferBottom(event eventobj)
 {
-  log("Attempting to send creature down...");
+  log "Attempting to send creature down..." endlog;
   if(!connections[3]) return false; // No other world connected to that edge
-  log("Proceeding");
+  log "Proceeding" endlog;
   if(eventobj.integers.size()<1) return false; // Erroneous event
   return transferCreature(eventobj.integers[0], 3);
 }
