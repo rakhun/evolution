@@ -326,8 +326,9 @@ int handleArg(int argc, const char** argv, int& i)
   }else if(!strcmp(argv[i], "-help")){
     puts("-connect [server]:[port]          Connect to another virtual world to extend it geographically");
     puts("-listen [port]                    Listen for incoming connections to extend the virtual world");
+    return -1; // = not handled/continue anyway
   }
-  return -1; // = not handled/continue anyway
+  return 0;
 }
 
 extern "C" {
