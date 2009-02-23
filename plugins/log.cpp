@@ -21,6 +21,7 @@ bool writelog(event eventobj)
   if(eventobj.strings.size()<1) return false;
   if(!logfile&&!(logfile=fopen("evolution.log", "w"))) return false;
   fputs(eventobj.strings[0], logfile);
+  fflush(logfile);
   return true;
 }
 
@@ -35,11 +36,12 @@ int handleArg(int argc, const char** argv, int& i)
     i++;
     if(logfile) fclose(logfile);
     logfile=fopen(argv[i], "w");
+    return 0;
   }else if(!strcmp(argv[i], "-help")){
     puts("-logfile [file]                   Write log messages to [file]");
     return -1;
   }
-  return 0;
+  return -1;
 }
 
 extern "C" {

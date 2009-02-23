@@ -328,7 +328,7 @@ int handleArg(int argc, const char** argv, int& i)
     puts("-listen [port]                    Listen for incoming connections to extend the virtual world");
     return -1; // = not handled/continue anyway
   }
-  return 0;
+  return -1;
 }
 
 extern "C" {
