@@ -55,13 +55,14 @@ void networkHandler(int connection)
     switch(packettype)
     {
     case 0:
-      log "Error! packettype 0 should not appear here" endlog;
+      log "Error! packettype 0 should not appear here\n" endlog;
       return;
     case 1:
-      log "Stub! got packettype 1 in networkHandler()" endlog;
+      printf("Stub! got packettype 1 in networkHandler()\n");
+      
       break;
     case 2:
-      log "Error! packettype 2 should not appear here" endlog;
+      log "Error! packettype 2 should not appear here\n" endlog;
       return;
     }
   }
@@ -199,6 +200,7 @@ void* networkServer2(void* socket)
       {
         //*Accepted, handle it
         connections[msg[1]-1]=*(int*)socket;
+        edge=msg[1];
         log "Accepting link request to edge %i\n", msg[1] endlog;
         msg[0]=2; // Confirm the request
         msg[1]=true;
@@ -210,7 +212,7 @@ void* networkServer2(void* socket)
         send(*(int*)socket, msg, 2, MSG_DONTWAIT);
       }
     }else{
-      log "Error! Only packettype 0 should be received by this part of the server" endlog;
+      log "Error! Only packettype 0 should be received by this part of the server\n" endlog;
       delete (int*)socket;
       return 0;
     }
@@ -233,9 +235,10 @@ bool transferCreature(int id, char edge)
   creatures->at(id)->getPosition(x, y);
   angle=creatures->at(id)->getAngle();
   health=creatures->at(id)->getLife();
-  unsigned int size=sizeof(float)*3+sizeof(unsigned int)*2+sizeof(int)*2+sizeof(unsigned char)*(512+col_length);
+  unsigned int size=sizeof(float)*3+sizeof(unsigned int)*2+sizeof(int)*2+sizeof(unsigned char)*(512+col_length+1);
   void* msg=malloc(size);
-  unsigned int pos=0;
+  ((char*)msg)[0]=1;
+  unsigned int pos=1;
   memcpy((void*)((size_t)msg+pos), &x, sizeof(x)); pos+=sizeof(x);
   memcpy((void*)((size_t)msg+pos), &y, sizeof(y)); pos+=sizeof(y);
   memcpy((void*)((size_t)msg+pos), &angle, sizeof(angle)); pos+=sizeof(angle);
@@ -257,6 +260,7 @@ bool transferCreature(int id, char edge)
  *	int health
  *	(30 bytes total, float & int=4, char=1)
  */
+  log "Sending message to transfer creature" endlog;
   send(connections[edge], msg, size, MSG_DONTWAIT);
   free(msg);
   pointerhub->unlockPointer("creatures");
