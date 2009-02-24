@@ -48,6 +48,7 @@ int connections[4]; // We might need some mutexes here preventing that we send a
 
 void networkHandler(int connection)
 {
+  unsigned char* col;
   unsigned char packettype;
   while(true)
   {
@@ -59,11 +60,41 @@ void networkHandler(int connection)
       return;
     case 1:
       printf("Stub! got packettype 1 in networkHandler()\n");
-      
+/*
+ * 1    float x         Sending a creature across, same for client and server
+ *      float y
+ *      float angle
+ *      u_int col_len
+ *      u_char*x col
+ *      u_int pointer
+ *      u_char*512 mem
+ *      int mempointer
+ *      int health
+ *      (30 bytes total, float & int=4, char=1)
+ */
+      float x, y, angle, health;
+      unsigned int col_len, pointer;
+      unsigned char mem[512];
+      int mempointer;
+      recv(connections[connection], &x, sizeof(float), 0);
+      recv(connections[connection], &y, sizeof(float), 0);
+      recv(connections[connection], &angle, sizeof(float), 0);
+      recv(connections[connection], &col_len, sizeof(unsigned int), 0);
+      printf("COL length is %i, reading %i bytes for col...\n", col_len, col_len);
+      col=(unsigned char*)malloc(col_len*sizeof(unsigned char));
+      recv(connections[connection], col, sizeof(unsigned char)*col_len, 0);
+      recv(connections[connection], &pointer, sizeof(unsigned int), 0);
+      recv(connections[connection], &mem, sizeof(unsigned char)*512, 0);
+      recv(connections[connection], &mempointer, sizeof(int), 0);
+      recv(connections[connection], &health, sizeof(float), 0);
+      printf("Received creature data:\nPosition: %f, %f\nAngle: %f\nCOL length: %i\nPointer: %i\nMempointer: %i\nHealth: %f\n", x, y, angle, col_len, pointer, mempointer, health);
+      delete col;
       break;
     case 2:
       log "Error! packettype 2 should not appear here\n" endlog;
       return;
+    default:
+      printf("Faulty packettype %u\n", packettype);
     }
   }
 }
@@ -148,6 +179,7 @@ void* networkConnect(void* voidserver)
     }
   }
   networkHandler(edge-1);
+  return 0;
 }
 
 void* networkServer(void* portstring)
@@ -166,6 +198,7 @@ void* networkServer(void* portstring)
   {
     pthread_create(new pthread_t, NULL, networkServer2, new int(client));
   }
+  return 0;
 }
 
 void* networkServer2(void* socket)
@@ -221,6 +254,7 @@ void* networkServer2(void* socket)
   connections[edge-1]=*(int*)socket;
   delete (int*)socket;
   networkHandler(edge-1);
+  return 0;
 }
 
 bool transferCreature(int id, char edge)
@@ -239,15 +273,16 @@ bool transferCreature(int id, char edge)
   void* msg=malloc(size);
   ((char*)msg)[0]=1;
   unsigned int pos=1;
-  memcpy((void*)((size_t)msg+pos), &x, sizeof(x)); pos+=sizeof(x);
-  memcpy((void*)((size_t)msg+pos), &y, sizeof(y)); pos+=sizeof(y);
-  memcpy((void*)((size_t)msg+pos), &angle, sizeof(angle)); pos+=sizeof(angle);
-  memcpy((void*)((size_t)msg+pos), &col_length, sizeof(col_length)); pos+=sizeof(col_length);
+  memcpy((void*)((size_t)msg+pos), &x, sizeof(float)); pos+=sizeof(float);
+  memcpy((void*)((size_t)msg+pos), &y, sizeof(float)); pos+=sizeof(float);
+  memcpy((void*)((size_t)msg+pos), &angle, sizeof(float)); pos+=sizeof(float);
+  memcpy((void*)((size_t)msg+pos), &col_length, sizeof(unsigned int)); pos+=sizeof(unsigned int);
   memcpy((void*)((size_t)msg+pos), col, sizeof(unsigned char)*col_length); pos+=sizeof(unsigned char)*col_length;
-  pos+=sizeof(unsigned int); // pointer
+  unsigned int zero=1;
+  memcpy((void*)((size_t)msg+pos), &zero, sizeof(unsigned int)); pos+=sizeof(unsigned int); // pointer
   pos+=sizeof(unsigned char)*512; // mem
-  pos+=sizeof(unsigned int); // mempointer
-  memcpy((void*)((size_t)msg+pos), &health, sizeof(health)); pos+=sizeof(health);
+  memcpy((void*)((size_t)msg+pos), &zero, sizeof(int)); pos+=sizeof(int); // mempointer
+  memcpy((void*)((size_t)msg+pos), &health, sizeof(float)); pos+=sizeof(float);
 /*
  * 1	float x		Sending a creature across, same for client and server
  *	float y
@@ -261,9 +296,10 @@ bool transferCreature(int id, char edge)
  *	(30 bytes total, float & int=4, char=1)
  */
   log "Sending message to transfer creature" endlog;
-  send(connections[edge], msg, size, MSG_DONTWAIT);
+  send(connections[(unsigned int)edge], msg, size, MSG_DONTWAIT);
   free(msg);
   pointerhub->unlockPointer("creatures");
+  return true;
 }
 
 bool transferLeft(event eventobj)
