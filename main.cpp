@@ -38,7 +38,7 @@ int main(int argc, const char** argv)
   if(pluginfiles)
   {
     struct dirent* file;
-    while(file=readdir(pluginfiles))
+    while((file=readdir(pluginfiles)))
     {
       if(!strcmp(".so", file->d_name+strlen(file->d_name)-3)) ///< @todo Cross platform library filename extensions
       {
@@ -68,7 +68,7 @@ int main(int argc, const char** argv)
     }
 
     // Loop through argument handlers provided by plugins.
-    for(int p=0; p<argHandlers.size(); p++)
+    for(unsigned int p=0; p<argHandlers.size(); p++)
     {
       if(argHandlers[p](argc, argv, i)!=-1){handled=true; break;}
     }

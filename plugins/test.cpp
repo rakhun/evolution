@@ -15,6 +15,7 @@
 bool eventtest(event eventobj)
 {
   printf("Received test event, it contained the integer %i\n", eventobj.integers[0]);
+  return true;
 }
 
 extern "C" {

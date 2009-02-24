@@ -34,14 +34,14 @@ void* commandinput(void* pointer)
     }
     char** argv=new char*[argc];
     char* arg=buffer;
-    unsigned int i=0;
-    while(i<argc)
+    int i=0;
+    while(i<argc) // Fill in arguments into argv
     {
       char* tmp=strchrnul(arg, ' ');
       tmp[0]=0;
       argv[i]=new char[tmp-arg+1];
       strcpy(argv[i], arg);
-      if(tmp[0]=' ') arg=tmp+1;
+      arg=tmp+1;
       i++;
     }
     /// @todo Delete this mem when you're done
@@ -83,7 +83,7 @@ void* commandinput(void* pointer)
           unsigned char* col=new unsigned char[size+1];
           col[size]=0;
           int pos=0;
-          for(int i=0; i<lines.size(); i++)
+          for(unsigned int i=0; i<lines.size(); i++)
           {
             strcpy((char*)(pos+col), lines[i]);
             pos+=strlen(lines[i]);
@@ -119,7 +119,7 @@ void* commandinput(void* pointer)
       }
       else{printf("Unknown command '%s'. Type 'help' to get a list of available commands\n", argv[0]);}
     }
-    for(unsigned int i=0; i<argc; i++) delete[] argv[i];
+    for(int i=0; i<argc; i++) delete[] argv[i];
     delete[] argv;
   }
 }
