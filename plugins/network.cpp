@@ -305,6 +305,7 @@ bool transferCreature(int id, char edge)
   log "Sending message to transfer creature" endlog;
   send(connections[(unsigned int)edge], msg, size, MSG_DONTWAIT);
   free(msg);
+  creatures->erase(creatures->begin()+id);
   pointerhub->unlockPointer("creatures");
   return true;
 }

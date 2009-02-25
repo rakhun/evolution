@@ -13,6 +13,7 @@
 /// @brief Main code for the creature class
 #include <vector>
 #include <string.h>
+#include <stdlib.h>
 #include "creature.h"
 #include "object.h"
 #include "pointers.h"
@@ -89,7 +90,8 @@ creature::creature(float x, float y, float angle, unsigned char* col, unsigned i
   this->x=x;
   this->y=y;
   this->angle=angle;
-  this->col=col; // Bad, redo this, allocating new memory and memcpy:ing
+  this->col=(unsigned char*)malloc(sizeof(unsigned char)*col_length);
+  memcpy(this->col, col, sizeof(unsigned char)*col_length);
   this->col_length=col_length;
   this->pointer=pointer;
   memcpy(this->mem, mem, 512);
