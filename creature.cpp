@@ -84,6 +84,19 @@ creature::creature(int x, int y, const unsigned char* code)
   args.clear();
 }
 
+creature::creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, int health)
+{
+  this->x=x;
+  this->y=y;
+  this->angle=angle;
+  this->col=col; // Bad, redo this, allocating new memory and memcpy:ing
+  this->col_length=col_length;
+  this->pointer=pointer;
+  memcpy(this->mem, mem, 512);
+  this->mempointer=mempointer;
+  this->health=health;
+}
+
 void creature::getCOL(unsigned char*& col, unsigned int& col_length)
 {
   col=this->col;
@@ -93,4 +106,14 @@ void creature::getCOL(unsigned char*& col, unsigned int& col_length)
 float creature::getAngle()
 {
   return angle;
+}
+
+unsigned int creature::getPointer()
+{
+  return pointer;
+}
+
+int creature::getMemPointer()
+{
+  return mempointer;
 }

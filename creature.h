@@ -44,6 +44,8 @@ public:
   /// @param parent_a One parent
   /// @param parent_b Another parent
   creature(creature* parent_a, creature* parent_b);
+  /// Create a new creature based on precise information
+  creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, int health);
   /// Retrieve the COL for this creature
   /// @param col Pointer to assign the address of this creature's COL
   /// @param col_length Integer to assign the length of the creature's COL
@@ -59,5 +61,7 @@ public:
   void execute();
   /// Return what value/"color" creatures will see this creature as
   unsigned char getType();
+  unsigned int getPointer();
+  int getMemPointer();
 };
 #endif
