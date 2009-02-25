@@ -49,6 +49,8 @@ int connections[4]; // We might need some mutexes here preventing that we send a
 void networkHandler(int connection)
 {
   unsigned char* col;
+  std::vector<creature*>* creatures;
+  creature* newcreature;
   unsigned char packettype;
   while(true)
   {
@@ -59,7 +61,6 @@ void networkHandler(int connection)
       log "Error! packettype 0 should not appear here\n" endlog;
       return;
     case 1:
-      printf("Stub! got packettype 1 in networkHandler()\n");
 /*
  * 1    float x         Sending a creature across, same for client and server
  *      float y
@@ -87,7 +88,11 @@ void networkHandler(int connection)
       recv(connections[connection], &mem, sizeof(unsigned char)*512, 0);
       recv(connections[connection], &mempointer, sizeof(int), 0);
       recv(connections[connection], &health, sizeof(float), 0);
-      printf("Received creature data:\nPosition: %f, %f\nAngle: %f\nCOL length: %i\nPointer: %i\nMempointer: %i\nHealth: %f\n", x, y, angle, col_len, pointer, mempointer, health);
+      log "Received creature data:\nPosition: %f, %f\nAngle: %f\nCOL length: %i\nPointer: %i\nMempointer: %i\nHealth: %f\n", x, y, angle, col_len, pointer, mempointer, health endlog;
+      newcreature=new creature(x, y, angle, col, col_len, pointer, mem, mempointer, health);
+      creatures=(std::vector<creature*>*)pointerhub->getPointerLockWait("creatures");
+      creatures->push_back(newcreature);
+      pointerhub->unlockPointer("creatures");
       delete col;
       break;
     case 2:
@@ -263,12 +268,15 @@ bool transferCreature(int id, char edge)
   std::vector<creature*>* creatures=(std::vector<creature*>*)pointerhub->getPointerLockWait("creatures");
   if(!creatures) return false;
   unsigned char* col;
-  unsigned int col_length;
+  unsigned int col_length, pointer;
+  int mempointer;
   creatures->at(id)->getCOL(col, col_length);
   float x, y, angle, health;
   creatures->at(id)->getPosition(x, y);
   angle=creatures->at(id)->getAngle();
   health=creatures->at(id)->getLife();
+  pointer=creatures->at(id)->getPointer();
+  mempointer=creatures->at(id)->getMemPointer();
   unsigned int size=sizeof(float)*3+sizeof(unsigned int)*2+sizeof(int)*2+sizeof(unsigned char)*(512+col_length+1);
   void* msg=malloc(size);
   ((char*)msg)[0]=1;
@@ -278,10 +286,9 @@ bool transferCreature(int id, char edge)
   memcpy((void*)((size_t)msg+pos), &angle, sizeof(float)); pos+=sizeof(float);
   memcpy((void*)((size_t)msg+pos), &col_length, sizeof(unsigned int)); pos+=sizeof(unsigned int);
   memcpy((void*)((size_t)msg+pos), col, sizeof(unsigned char)*col_length); pos+=sizeof(unsigned char)*col_length;
-  unsigned int zero=1;
-  memcpy((void*)((size_t)msg+pos), &zero, sizeof(unsigned int)); pos+=sizeof(unsigned int); // pointer
+  memcpy((void*)((size_t)msg+pos), &pointer, sizeof(unsigned int)); pos+=sizeof(unsigned int); // pointer
   pos+=sizeof(unsigned char)*512; // mem
-  memcpy((void*)((size_t)msg+pos), &zero, sizeof(int)); pos+=sizeof(int); // mempointer
+  memcpy((void*)((size_t)msg+pos), &mempointer, sizeof(int)); pos+=sizeof(int); // mempointer
   memcpy((void*)((size_t)msg+pos), &health, sizeof(float)); pos+=sizeof(float);
 /*
  * 1	float x		Sending a creature across, same for client and server
