@@ -58,6 +58,7 @@ void* commandinput(void* pointer)
         puts("create [type] [X] [Y] Creates a new creature at X, Y.");
         puts("                       Type=default or manual (using a default");
         puts("                       COL script or entering code manually)");
+        puts("printcol [ID]         Print the COL of a creature");
         puts("ls                    List creatures and some values");
       }
       else if(!strcmp(argv[0], "create"))
@@ -113,7 +114,30 @@ void* commandinput(void* pointer)
           unsigned char* col;
           unsigned int col_length;
           people->at(i)->getCOL(col, col_length);
-          printf("X: %f, Y: %f, Health: %i, COL-length: %i\n", x, y, people->at(i)->getLife(), col_length);
+          printf("ID: %i, X: %f, Y: %f, Health: %i, COL-length: %i\n", i, x, y, people->at(i)->getLife(), col_length);
+        }
+        ((pointers*)pointer)->unlockPointer("creatures");
+      }
+      else if(!strcmp(argv[0], "printcol"))
+      {
+        if(argc!=2)
+        {
+          puts("Usage: printcol [creature ID]");
+          continue;
+        }
+        std::vector<creature*>* people=(std::vector<creature*>*)((pointers*)pointer)->getPointerLockWait("creatures");
+        if(atoi(argv[1])<0||atoi(argv[1])>=people->size())
+        {
+          puts("ID out of range");
+          ((pointers*)pointer)->unlockPointer("creatures");
+          continue;
+        }
+        unsigned char* col;
+        unsigned int col_length;
+        people->at(atoi(argv[1]))->getCOL(col, col_length);
+        for(unsigned int i=0; i<col_length*2; i+=2)
+        {
+          printf("%x:%x\n", col[i], col[i+1]);
         }
         ((pointers*)pointer)->unlockPointer("creatures");
       }
