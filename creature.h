@@ -61,7 +61,9 @@ public:
   void execute();
   /// Return what value/"color" creatures will see this creature as
   unsigned char getType();
+  /// Return pointer refering to where in the COL code the creature is operating
   unsigned int getPointer();
+  /// Return pointer pointing to the currently active byte in the creature's memory
   int getMemPointer();
 };
 #endif
