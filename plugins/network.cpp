@@ -232,7 +232,10 @@ void* networkServer2(void* socket)
         delete (int*)socket;
         return 0;
       }
-      //edge=0;
+      if(msg[1]>2)
+        msg[1]-=2
+      else
+        msg[1]+=2
       if(msg[1]<5&&msg[1]>0&&!connections[msg[1]-1])
       {
         //*Accepted, handle it
