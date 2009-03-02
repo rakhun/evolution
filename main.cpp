@@ -87,13 +87,14 @@ int main(int argc, const char** argv)
     pointers::getInstance()->getPointerLockWait("creatures");
     for(unsigned int i=0; i<people.size(); i++)
     {
-      people[i]->execute();
-      if(people[i]->getLife()<=0){
-        people[i]->die(); // Isn't life being 0 enough?
+      people.at(i)->execute();
+      if(people.at(i)->getLife()<=0){
+        people.at(i)->die(); // Isn't life being 0 enough?
         people.erase(people.begin()+i);
         i--;
+        continue;
       }
-      people[i]->getPosition(x, y);
+      people.at(i)->getPosition(x, y);
       if(x<0)
       {
         x+=worldinfo.width;
