@@ -85,7 +85,7 @@ creature::creature(int x, int y, const unsigned char* code)
   args.clear();
 }
 
-creature::creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, int health)
+creature::creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, float health)
 {
   this->x=x;
   this->y=y;

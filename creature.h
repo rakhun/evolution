@@ -22,7 +22,7 @@ private:
   unsigned int pointer;
   unsigned char mem[512];
   int mempointer;
-  int health;
+  float health;
 
   unsigned char charToNumber(unsigned char value)
   {
@@ -45,7 +45,7 @@ public:
   /// @param parent_b Another parent
   creature(creature* parent_a, creature* parent_b);
   /// Create a new creature based on precise information
-  creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, int health);
+  creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, float health);
   /// Retrieve the COL for this creature
   /// @param col Pointer to assign the address of this creature's COL
   /// @param col_length Integer to assign the length of the creature's COL
@@ -54,7 +54,7 @@ public:
   float getAngle();
   /// Returns the creature's health value
   /// @return The health level of the creature
-  int getLife(){return health;} 
+  float getLife(){return health;} 
   /// Kills the creature, unsure if this will be needed, health<=0 might suffice
   void die(){health=0;}
   /// Execute the current command currently pointed at and increment the pointer

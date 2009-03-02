@@ -124,14 +124,14 @@ void creature::writeVisual(unsigned char* mem, int mempointer, int resolution)
     }
     if(fabs(objangle-angle)<=1.5)
     {
-      int angleindex=resolution*(objangle-angle+1.5)/3;
+      int angleindex=(int)(resolution*(objangle-angle+1.5)/3);
       /* Chceck if the distance to the object is less than  */
       /*   distance[resolution*angle/MAX_ANGLE]             */
       float thisdistance=sqrtf((Y-this->y)*(Y-this->y)+(X-this->x)*(X-this->x));
       if(thisdistance<distance[angleindex])
       {
         /* Store the image of this object in memory and note its distance */
-        distance[angleindex]=thisdistance;
+        distance[angleindex]=(unsigned int)thisdistance;
         mem[mempointer+angleindex]=objiter->getType();
       }
     }
