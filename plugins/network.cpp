@@ -81,9 +81,8 @@ void networkHandler(int connection)
       recv(connections[connection], &y, sizeof(float), 0);
       recv(connections[connection], &angle, sizeof(float), 0);
       recv(connections[connection], &col_len, sizeof(unsigned int), 0);
-      printf("COL length is %i, reading %i bytes for col...\n", col_len, col_len);
-      col=(unsigned char*)malloc(col_len*sizeof(unsigned char));
-      recv(connections[connection], col, sizeof(unsigned char)*col_len, 0);
+      col=(unsigned char*)malloc(col_len*sizeof(unsigned char)*2);
+      recv(connections[connection], col, sizeof(unsigned char)*2*col_len, 0);
       recv(connections[connection], &pointer, sizeof(unsigned int), 0);
       recv(connections[connection], &mem, sizeof(unsigned char)*512, 0);
       recv(connections[connection], &mempointer, sizeof(int), 0);
@@ -277,7 +276,7 @@ bool transferCreature(int id, char edge)
   health=creatures->at(id)->getLife();
   pointer=creatures->at(id)->getPointer();
   mempointer=creatures->at(id)->getMemPointer();
-  unsigned int size=sizeof(float)*3+sizeof(unsigned int)*2+sizeof(int)*2+sizeof(unsigned char)*(512+col_length+1);
+  unsigned int size=sizeof(float)*3+sizeof(unsigned int)*2+sizeof(int)*2+sizeof(unsigned char)*(512+col_length*2+1);
   void* msg=malloc(size);
   ((char*)msg)[0]=1;
   unsigned int pos=1;
@@ -285,7 +284,7 @@ bool transferCreature(int id, char edge)
   memcpy((void*)((size_t)msg+pos), &y, sizeof(float)); pos+=sizeof(float);
   memcpy((void*)((size_t)msg+pos), &angle, sizeof(float)); pos+=sizeof(float);
   memcpy((void*)((size_t)msg+pos), &col_length, sizeof(unsigned int)); pos+=sizeof(unsigned int);
-  memcpy((void*)((size_t)msg+pos), col, sizeof(unsigned char)*col_length); pos+=sizeof(unsigned char)*col_length;
+  memcpy((void*)((size_t)msg+pos), col, sizeof(unsigned char)*2*col_length); pos+=sizeof(unsigned char)*2*col_length;
   memcpy((void*)((size_t)msg+pos), &pointer, sizeof(unsigned int)); pos+=sizeof(unsigned int); // pointer
   pos+=sizeof(unsigned char)*512; // mem
   memcpy((void*)((size_t)msg+pos), &mempointer, sizeof(int)); pos+=sizeof(int); // mempointer

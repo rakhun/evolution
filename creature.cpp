@@ -90,8 +90,8 @@ creature::creature(float x, float y, float angle, unsigned char* col, unsigned i
   this->x=x;
   this->y=y;
   this->angle=angle;
-  this->col=(unsigned char*)malloc(sizeof(unsigned char)*col_length);
-  memcpy(this->col, col, sizeof(unsigned char)*col_length);
+  this->col=(unsigned char*)malloc(sizeof(unsigned char)*2*col_length);
+  memcpy(this->col, col, sizeof(unsigned char)*2*col_length);
   this->col_length=col_length;
   this->pointer=pointer;
   memcpy(this->mem, mem, 512);
