@@ -385,22 +385,22 @@ extern "C" {
   {
     if(connections[0])
     {
-      shutdown(connections[0], 3);
+      shutdown(connections[0], SHUT_RDWR);
       close(connections[0]);
     }
     if(connections[1])
     {
-      shutdown(connections[1], 3);
+      shutdown(connections[1], SHUT_RDWR);
       close(connections[1]);
     }
     if(connections[2])
     {
-      shutdown(connections[2], 3);
+      shutdown(connections[2], SHUT_RDWR);
       close(connections[2]);
     }
     if(connections[3])
     {
-      shutdown(connections[3], 3);
+      shutdown(connections[3], SHUT_RDWR);
       close(connections[3]);
     }
   }
