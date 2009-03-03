@@ -14,6 +14,7 @@
 #include <dirent.h>
 #include <dlfcn.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include "creature.h"
 #include "pointers.h"
 #include "eventmanager.h"
@@ -64,6 +65,31 @@ int main(int argc, const char** argv)
     {
       puts("Available options:");
       puts("-help                             Print this list of options");
+      puts("-width [pixels]                   Set the world width");
+      puts("-height [pixels]                  Set the world height");
+      handled=true;
+    }
+
+    if(!strcmp(argv[i], "-width"))
+    {
+      i++;
+      if(i>=argc)
+      {
+        fputs("-width: missing argument\n", stderr);
+        exit(1);
+      }
+      worldinfo.width=atoi(argv[i]);
+      handled=true;
+    }
+    if(!strcmp(argv[i], "-height"))
+    {
+      i++;
+      if(i>=argc)
+      {
+        fputs("-height: missing argument\n", stderr);
+        exit(1);
+      }
+      worldinfo.height=atoi(argv[i]);
       handled=true;
     }
 

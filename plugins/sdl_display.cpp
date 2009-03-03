@@ -41,6 +41,7 @@ void draw(SDL_Surface* screen, SDL_Rect* bg)
 
 void* SDL_Display(void* pointer)
 {
+  sleep(1); // Wait for other things to initialize, like handling -width and -height to set the world size
   pointerobj=(pointers*)pointer;
   world* worldobj=(world*)pointerobj->getPointer("world");
   if(!worldobj||SDL_Init(SDL_INIT_EVERYTHING)==-1) pthread_exit(0);
