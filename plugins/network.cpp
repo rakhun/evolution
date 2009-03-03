@@ -28,6 +28,12 @@
  * 			requested was successful (1) or failed (0), in which
  * 			case the client will attempt the next edge provided.
  * 			Sort of the key to enter networkHandler(..)
+ * 3			Ping, just a message head asking for a ping message
+ * 			in return, this will not result in a loop since when
+ * 			one host pings (and gets an answer), it is running
+ * 			another piece of code already, waiting for a single
+ * 			incoming byte (which will be ignored, but noted as
+ * 			presence)
  */
 #include <stdio.h>
 #include <string.h>
@@ -51,18 +57,24 @@ struct world* world;
 void networkHandler(int connection)
 {
   unsigned char* col;
+  unsigned char ping=3;
   std::vector<creature*>* creatures;
   creature* newcreature;
   unsigned char packettype;
   while(true)
   {
-    if(recv(connections[connection], &packettype, 1, 0)<1) return;
+    if(recv(connections[connection], &packettype, 1, 0)<1)
+    {
+      close(connections[connection]);
+      connections[connection]=0;
+      return;
+    }
     switch(packettype)
     {
-    case 0:
+    case 0: // Available edges offer
       log "Error! packettype 0 should not appear here\n" endlog;
       return;
-    case 1:
+    case 1: // Transfer creature
       float x, y, angle, health;
       unsigned int col_len, pointer;
       unsigned char mem[512];
@@ -86,11 +98,14 @@ void networkHandler(int connection)
       pointerhub->unlockPointer("creatures");
       delete col;
       break;
-    case 2:
+    case 2: // Edge-connect confirmation
       log "Error! packettype 2 should not appear here\n" endlog;
       return;
+    case 3: // Ping
+      write(connections[connection], &ping, sizeof(unsigned char));
+      break;
     default:
-      printf("Faulty packettype %u\n", packettype);
+      printf("Faulty packettype %u, ignored\n", packettype);
     }
   }
 }
@@ -286,9 +301,14 @@ bool transferCreature(int id, char edge)
   pos+=sizeof(unsigned char)*512;
   memcpy((void*)((size_t)msg+pos), &mempointer, sizeof(int)); pos+=sizeof(int);
   memcpy((void*)((size_t)msg+pos), &health, sizeof(float)); pos+=sizeof(float);
-  send(connections[(unsigned int)edge], msg, size, MSG_DONTWAIT);
+  unsigned char ping=3;
+  write(connections[(unsigned int)edge], &ping, sizeof(unsigned char));
+  if(read(connections[(unsigned int)edge], &ping, sizeof(unsigned char)))
+  {
+    send(connections[(unsigned int)edge], msg, size, MSG_DONTWAIT);
+    creatures->erase(creatures->begin()+id);
+  }
   free(msg);
-  creatures->erase(creatures->begin()+id);
   pointerhub->unlockPointer("creatures");
   return true;
 }
