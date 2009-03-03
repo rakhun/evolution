@@ -14,16 +14,16 @@
  * 0	char edge	Server tells the client which edges are available.
  *			Client responds with value 0 (cancel) or which edge
  *			to connect with
- * 1	float x		Sending a creature across, same for client and server
- *	float y
- *	float angle
- *	u_int col_len
+ * 1	float x		Sending a creature across, same for client and server,
+ *	float y		X and Y are divided by the remote world's width
+ *	float angle	and height to scale when going between worlds with
+ *	u_int col_len	different sizes.
  *	u_char*x col
  *	u_int pointer
  *	u_char*512 mem
  *	int mempointer
- *	int health
- *	(30 bytes total, float & int=4, char=1)
+ *	float health
+ *	(30+col_len bytes total, float & int=4, char=1)
  * 2	bool		Server tells the client that the connection to the edge
  * 			requested was successful (1) or failed (0), in which
  * 			case the client will attempt the next edge provided.
@@ -44,7 +44,7 @@
 void* networkServer2(void*);
 
 pointers* pointerhub;
-int connections[4]; // We might need some mutexes here preventing that we send and receive at the same time on a connection
+int connections[4];
 
 void networkHandler(int connection)
 {
@@ -61,18 +61,6 @@ void networkHandler(int connection)
       log "Error! packettype 0 should not appear here\n" endlog;
       return;
     case 1:
-/*
- * 1    float x         Sending a creature across, same for client and server
- *      float y
- *      float angle
- *      u_int col_len
- *      u_char*x col
- *      u_int pointer
- *      u_char*512 mem
- *      int mempointer
- *      int health
- *      (30 bytes total, float & int=4, char=1)
- */
       float x, y, angle, health;
       unsigned int col_len, pointer;
       unsigned char mem[512];
@@ -288,22 +276,10 @@ bool transferCreature(int id, char edge)
   memcpy((void*)((size_t)msg+pos), &angle, sizeof(float)); pos+=sizeof(float);
   memcpy((void*)((size_t)msg+pos), &col_length, sizeof(unsigned int)); pos+=sizeof(unsigned int);
   memcpy((void*)((size_t)msg+pos), col, sizeof(unsigned char)*2*col_length); pos+=sizeof(unsigned char)*2*col_length;
-  memcpy((void*)((size_t)msg+pos), &pointer, sizeof(unsigned int)); pos+=sizeof(unsigned int); // pointer
-  pos+=sizeof(unsigned char)*512; // mem
-  memcpy((void*)((size_t)msg+pos), &mempointer, sizeof(int)); pos+=sizeof(int); // mempointer
+  memcpy((void*)((size_t)msg+pos), &pointer, sizeof(unsigned int)); pos+=sizeof(unsigned int);
+  pos+=sizeof(unsigned char)*512;
+  memcpy((void*)((size_t)msg+pos), &mempointer, sizeof(int)); pos+=sizeof(int);
   memcpy((void*)((size_t)msg+pos), &health, sizeof(float)); pos+=sizeof(float);
-/*
- * 1	float x		Sending a creature across, same for client and server
- *	float y
- *	float angle
- *	u_int col_len
- *	u_char*x col
- *	u_int pointer
- *	u_char*512 mem
- *	int mempointer
- *	int health
- *	(30 bytes total, float & int=4, char=1)
- */
   log "Sending message to transfer creature" endlog;
   send(connections[(unsigned int)edge], msg, size, MSG_DONTWAIT);
   free(msg);
