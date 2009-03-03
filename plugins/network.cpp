@@ -40,11 +40,13 @@
 #include "../eventmanager.h"
 #include "../creature.h"
 #include "../log.h"
+#include "../world.h"
 
 void* networkServer2(void*);
 
 pointers* pointerhub;
 int connections[4];
+struct world* world;
 
 void networkHandler(int connection)
 {
@@ -75,6 +77,8 @@ void networkHandler(int connection)
       recv(connections[connection], &mem, sizeof(unsigned char)*512, 0);
       recv(connections[connection], &mempointer, sizeof(int), 0);
       recv(connections[connection], &health, sizeof(float), 0);
+      x*=world->width;
+      y*=world->height;
       log "Received creature data:\nPosition: %f, %f\nAngle: %f\nCOL length: %i\nPointer: %i\nMempointer: %i\nHealth: %f\n", x, y, angle, col_len, pointer, mempointer, health endlog;
       newcreature=new creature(x, y, angle, col, col_len, pointer, mem, mempointer, health);
       creatures=(std::vector<creature*>*)pointerhub->getPointerLockWait("creatures");
@@ -263,6 +267,8 @@ bool transferCreature(int id, char edge)
   creatures->at(id)->getCOL(col, col_length);
   float x, y, angle, health;
   creatures->at(id)->getPosition(x, y);
+  x/=world->width;
+  y/=world->height;
   angle=creatures->at(id)->getAngle();
   health=creatures->at(id)->getLife();
   pointer=creatures->at(id)->getPointer();
@@ -280,7 +286,6 @@ bool transferCreature(int id, char edge)
   pos+=sizeof(unsigned char)*512;
   memcpy((void*)((size_t)msg+pos), &mempointer, sizeof(int)); pos+=sizeof(int);
   memcpy((void*)((size_t)msg+pos), &health, sizeof(float)); pos+=sizeof(float);
-  log "Sending message to transfer creature" endlog;
   send(connections[(unsigned int)edge], msg, size, MSG_DONTWAIT);
   free(msg);
   creatures->erase(creatures->begin()+id);
@@ -367,6 +372,12 @@ extern "C" {
     ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp bottom", transferBottom);
     ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp left", transferLeft);
     ((eventManager*)pointersobj->getPointer("eventManager"))->registerEvent("warp right", transferRight);
+    if(!(world=(struct world*)pointersobj->getPointer("world")))
+    {
+      world=new struct world; // Getting the global world failed, make our own and assign default values to it
+      world->width=500;
+      world->height=500;
+    }
   }
 
   __attribute__((destructor))
