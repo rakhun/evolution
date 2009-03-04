@@ -42,6 +42,8 @@ public:
   creature(int x, int y, const unsigned char* code);
   /// Create a new creature based on precise information
   creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, float health);
+  /// Destructor for the creature object, cleaning up after itself
+  ~creature();
   /// Retrieve the COL for this creature
   /// @param col Pointer to assign the address of this creature's COL
   /// @param col_length Integer to assign the length of the creature's COL

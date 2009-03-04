@@ -17,17 +17,20 @@
 #include "creature.h"
 #include "object.h"
 #include "pointers.h"
+#include "log.h"
 
 creature::creature(int x, int y, const unsigned char* code)
 {
   Object** tmpobj=(Object**)pointers::getInstance()->getPointerLockWait("objects");
   if(!tmpobj)
   {
-    /* Log this error */
+    log "Failed to add creature to objects iterator\n" endlog;
   }else{
     this->next=*tmpobj;
+    if(*tmpobj) (*tmpobj)->previous=this;
     *tmpobj=this;
   }
+  previous=0;
   pointers::getInstance()->unlockPointer("objects");
   this->x=x;
   this->y=y;
@@ -97,6 +100,17 @@ creature::creature(float x, float y, float angle, unsigned char* col, unsigned i
   memcpy(this->mem, mem, 512);
   this->mempointer=mempointer;
   this->health=health;
+}
+
+creature::~creature()
+{
+  // Remove itself from the objects iterator
+  if(previous)
+  {
+    previous->next=next;
+  }else{ // Only the first object in the iterator has no previous object
+    Object::iter=next;
+  }
 }
 
 void creature::getCOL(unsigned char*& col, unsigned int& col_length)

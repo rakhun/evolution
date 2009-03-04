@@ -21,6 +21,7 @@ protected:
 public:
   static Object* iter; ///< Pointer to the first object in the iterator list
   Object* next; ///< Pointer to the next object in the list
+  Object* previous; ///< Pointer to the previous object in the list
 
   /// Read the object's position into two integers
   void getPosition(float& x, float& y);

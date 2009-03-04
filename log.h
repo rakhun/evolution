@@ -1,4 +1,7 @@
 #ifndef log
+#include <stdio.h>
+#include "eventmanager.h"
+
 #define log \
   {event logmsg; \
   logmsg.name="log"; \
