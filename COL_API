@@ -6,16 +6,27 @@ F0:0D
 Specifics: in functions using x-128, the value will be increased by one if the result is 0 or more, this is to make the maximum and minimum values more even, and an argument of zero would give no result either way
 
 Command		Argument	Description
-0 Walk		Length (x-128)	Walk, longer distance gives higher health penalty
-1 Turn		Angle (x-128)	Turn $Angle/256 of a rotation from the current angle
+0 Walk		Length (x-128)	Walk, longer distance gives higher health
+				  penalty
+1 Turn		Angle (x-128)	Turn $Angle/256 of a rotation from the current
+				  angle
 2 Jump		Length (x-128)	Jump $Length steps with the pointer
 3 Look		Datasize	Write visual information to memory, scaling
-				resolution to fit the datasize.
+				  resolution to fit the datasize.
 4 Mempointer	Length (x-128)	Move the memory pointer $Length steps
-5 If		Value		Execute the following command if mem[$memP]=$Value
-6 IfNot		Value		Execute the following command if mem[$memP]!=$Value
-7 IfMore	Value		Execute the following command if mem[$memP]>$Value
-8 IfLess	Value		Execute the following command if mem[$memP]<$Value
+5 If		Value		Execute the following command if
+				  mem[$memP]=$Value
+6 IfNot		Value		Execute the following command if
+				  mem[$memP]!=$Value
+7 IfMore	Value		Execute the following command if
+				  mem[$memP]>$Value
+8 IfLess	Value		Execute the following command if
+				  mem[$memP]<$Value
 9 Eat		?		Try to consume the object in front
 a Attack	?		Try to attack the object in front
 b Push		?		Try to push the object in front forward
+c Custom	Custom ID	Send an event, allowing plugins to add COL
+				  features
+d Custom arg	Argument	Send an event for setting an argument for custom				  functions (the plugin will catch the event
+				  and deal with saving it until its function
+				  is called)
