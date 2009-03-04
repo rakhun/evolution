@@ -23,9 +23,11 @@ void creature::execute()
 {
   if(!col_length) return; // Creatures like that ought to die.. but nature will deal with that
   unsigned char arg=col[pointer*2+1];
+  event eventobj;
+  eventManager* eventMgr;
   switch(col[pointer*2])
   {
-  case 0:
+  case 0: // Walk
     if(arg>127)
     {
       x+=cos(angle)*(arg-127)/64;
@@ -35,7 +37,7 @@ void creature::execute()
       y+=sin(angle)*(arg-128)/64;
     }
     break;
-  case 1:
+  case 1: // Turn
     if(arg>127)
     {
       angle+=M_PIl*(arg-127)/128;
@@ -43,15 +45,15 @@ void creature::execute()
       angle+=M_PIl*(arg-128)/128;
     }
     break;
-  case 2:
+  case 2: // Jump (pointer)
     if(arg>127) // Always go back one more step so that +0 (which we don't have) would result in a loop
       pointer+=arg-128;
     else
       pointer+=arg-129;
     break;
-  case 3:
+  case 3: // Look
     break;
-  case 4:
+  case 4: // Move mempointer
     if(arg>127)
       mempointer+=arg-127;
     else
@@ -59,23 +61,37 @@ void creature::execute()
     if(mempointer>511) mempointer-=512;
     if(mempointer<0) mempointer+=512;
     break;
-  case 5:
+  case 5: // If
     if(mem[mempointer]!=arg) pointer++;
     break;
-  case 6:
+  case 6: // If not
     if(mem[mempointer]==arg) pointer++;
     break;
-  case 7:
+  case 7: // If more
     if(mem[mempointer]<=arg) pointer++;
     break;
-  case 8:
+  case 8: // If less
     if(mem[mempointer]>=arg) pointer++;
     break;
-  case 9:
+  case 9: // Eat
     break;
-  case 10:
+  case 10: // Attack
     break;
-  case 11:
+  case 11: // Push
+    break;
+  case 12: // Custom (send an event for plugins to handle)
+    eventobj.name="CustomCOL";
+    eventobj.integers.push_back(arg);
+    eventobj.pointers.push_back(this);
+    eventMgr=(eventManager*)pointers::getInstance()->getPointer("eventManager");
+    eventMgr->triggerEvent(eventobj);
+    break;
+  case 13: // Custom arg (send an event for plugins to handle, and save for the Custom command)
+    eventobj.name="CustomCOLarg";
+    eventobj.integers.push_back(arg);
+    eventobj.pointers.push_back(this);
+    eventMgr=(eventManager*)pointers::getInstance()->getPointer("eventManager");
+    eventMgr->triggerEvent(eventobj);
     break;
   default:
     log "Command not implemented: %i\n", col[pointer] endlog;
