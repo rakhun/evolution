@@ -74,11 +74,11 @@ void creature::execute()
   case 8: // If less
     if(mem[mempointer]>=arg) pointer++;
     break;
-  case 9: // Eat
+  case 9:  // Eat	MISSING
     break;
-  case 10: // Attack
+  case 10: // Attack	MISSING
     break;
-  case 11: // Push
+  case 11: // Procreate	MISSING
     break;
   case 12: // Custom (send an event for plugins to handle)
     eventobj.name="CustomCOL";

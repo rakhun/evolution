@@ -24,7 +24,8 @@ Command		Argument	Description
 				  mem[$memP]<$Value
 9 Eat		?		Try to consume the object in front
 a Attack	?		Try to attack the object in front
-b Push		?		Try to push the object in front forward
+b Procreate	?		Create a child (with mutations) in front of
+				  the creature, argument ignored
 c Custom	Custom ID	Send an event, allowing plugins to add COL
 				  features
 d Custom arg	Argument	Send an event for setting an argument for custom				  functions (the plugin will catch the event
