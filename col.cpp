@@ -21,6 +21,7 @@
 
 void creature::execute()
 {
+  health-=0.0001;
   if(!col_length) return; // Creatures like that ought to die.. but nature will deal with that
   unsigned char arg=col[pointer*2+1];
   event eventobj;
@@ -32,17 +33,21 @@ void creature::execute()
     {
       x+=cos(angle)*(arg-127)/64;
       y+=sin(angle)*(arg-127)/64;
+      health-=fabsf(arg-127)/10240;
     }else{
       x+=cos(angle)*(arg-128)/64;
       y+=sin(angle)*(arg-128)/64;
+      health-=fabsf(arg-128)/10240;
     }
     break;
   case 1: // Turn
     if(arg>127)
     {
       angle+=M_PIl*(arg-127)/128;
+      health-=fabsf(arg-127)/40960;
     }else{
       angle+=M_PIl*(arg-128)/128;
+      health-=fabsf(arg-128)/40960;
     }
     break;
   case 2: // Jump (pointer)
