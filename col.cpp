@@ -52,6 +52,7 @@ void creature::execute()
       pointer+=arg-129;
     break;
   case 3: // Look
+    writeVisual(mem, mempointer, arg);
     break;
   case 4: // Move mempointer
     if(arg>127)
