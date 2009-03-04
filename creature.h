@@ -40,10 +40,6 @@ public:
   /// @param y The new creature's Y coordinate
   /// @param code The COL code for the new creature
   creature(int x, int y, const unsigned char* code);
-  /// Create a new creature based on two parents
-  /// @param parent_a One parent
-  /// @param parent_b Another parent
-  creature(creature* parent_a, creature* parent_b);
   /// Create a new creature based on precise information
   creature(float x, float y, float angle, unsigned char* col, unsigned int col_length, unsigned int pointer, unsigned char* mem, int mempointer, float health);
   /// Retrieve the COL for this creature
