@@ -114,7 +114,7 @@ void* commandinput(void* pointer)
           unsigned char* col;
           unsigned int col_length;
           people->at(i)->getCOL(col, col_length);
-          printf("ID: %i, X: %f, Y: %f, Health: %i, COL-length: %i\n", i, x, y, people->at(i)->getLife(), col_length);
+          printf("ID: %i, X: %f, Y: %f, Health: %f, COL-length: %i\n", i, x, y, people->at(i)->getLife(), col_length);
         }
         ((pointers*)pointer)->unlockPointer("creatures");
       }
