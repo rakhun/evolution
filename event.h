@@ -23,5 +23,7 @@ struct event
   std::vector<float> floats;
   /// String values contained in the event
   std::vector<const char*> strings;
+  /// Other pointers contained in the event
+  std::vector<void*> pointers;
 };
 #endif
