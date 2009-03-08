@@ -31,3 +31,12 @@ c Custom	Custom ID	Send an event, allowing plugins to add COL
 d Custom arg	Argument	Send an event for setting an argument for custom				  functions (the plugin will catch the event
 				  and deal with saving it until its function
 				  is called)
+e Get info	Info ID		Retrieve information about oneself and store it
+				  at mem[$memP], bigger values will be stored as
+				  {2, 2, 8}, where the first 2 indicates that
+				  there are two bytes in the value, the second 2
+				  means 2*256¹ and 8 is 8*256⁰, writing 520
+				  0=health (cropped to 0 to 255)
+				  1=health {length, digit1, digit2, ...}
+				  2=age, in minutes
+				  3=age in seconds {length, digit1, digit2, ...}
