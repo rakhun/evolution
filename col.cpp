@@ -26,6 +26,8 @@ void creature::execute()
   unsigned char arg=col[pointer*2+1];
   event eventobj;
   eventManager* eventMgr;
+  int iTmp;
+  int iTmp2;
   switch(col[pointer*2])
   {
   case 0: // Walk
@@ -99,6 +101,24 @@ void creature::execute()
     eventMgr=(eventManager*)pointers::getInstance()->getPointer("eventManager");
     eventMgr->triggerEvent(eventobj);
     break;
+  case 14: // Get info (get info about self based on an ID for information type)
+    if(arg==0) // Get health, single byte
+    {
+      if(health<0) mem[mempointer]=0;
+      else if(health>255) mem[mempointer]=255;
+      else mem[mempointer]=(unsigned char)health;
+    }else if(arg==1) // Get health, multibyte
+    {
+      iTmp=(health>0?(int)health:0);
+      iTmp2=0;
+      while(iTmp!=0)
+      {
+        iTmp2++;
+        mem[(mempointer+iTmp2<512?mempointer+iTmp2:511)]=iTmp&255;
+        iTmp=(iTmp-(iTmp&255))/256;
+      }
+      mem[mempointer]=iTmp2;
+    }
   default:
     log "Command not implemented: %i\n", col[pointer] endlog;
   }
